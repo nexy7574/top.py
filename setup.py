@@ -35,7 +35,6 @@ setup(
     },
     python_requires=">=3.6",
     classifiers=[
-        'License :: MIT License',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Operating System :: OS Independent',

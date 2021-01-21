@@ -25,12 +25,17 @@ class TopGG:
             self,
             bot: Union[C, B, AC, AB],
             *,
-            token: str
+            token: str,
+            autopost_every: int = 60
     ):
         self.bot = bot
         self.token = token
         # noinspection PyTypeChecker
         self.session = None  # type: aiohttp.ClientSession
+        self.autopost_interval = autopost_every
+        self.autopost_task = None
+        if self.autopost_interval:
+            self.autopost_task = self.bot.loop.create_task(self._autopost())
 
         async def set_session():
             self.session = aiohttp.ClientSession(
@@ -45,10 +50,19 @@ class TopGG:
             # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
         self._session_setter = self.bot.loop.create_task(set_session)
 
+    def __del__(self):
+        if self.autopost_task:
+            self.autopost_task.cancel()
+
     async def _wf_s(self):
         if not self.session:
             await self._session_setter
         return
+
+    async def _autopost(self):
+        while True:
+            await self.post_stats()
+            await asyncio.sleep(self.autopost_interval)
 
     async def _request(self, method: str, uri: str, **kwargs):
         fail_if_timeout = kwargs.pop("fail_if_timeout", True)
