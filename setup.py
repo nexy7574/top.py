@@ -1,10 +1,10 @@
 from setuptools import setup
 from re import compile
 
-version_regex = compile(r"__version__ = (?P<v>[0-9]\.[0-9]\.[0-9])")
+version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)\"")
 
 with open("requirements.txt") as requirements:
-    reqs = requirements.readlines()
+    reqs = requirements.read().splitlines()
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -20,13 +20,12 @@ setup(
     url='https://github.com/dragdev-studios/top.py',
     license='MIT',
     author='EEKIM10',
-    requirements=reqs,
     author_email='eek@clicksminuteper.net',
     description='A new, modern API wrapper for top.gg',
     long_description=readme,
     long_description_content_type="text/markdown",
     include_package_data=True,
-    install_requires=requirements,
+    install_requires=reqs,
     extras_require={
         "webhook_server": [
             "uvicorn",
