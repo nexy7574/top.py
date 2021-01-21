@@ -4,6 +4,7 @@ from typing import Optional, List
 from discord.colour import Colour
 from discord.utils import oauth_url as invite
 from datetime import datetime
+from aiohttp import ClientSession
 
 
 class WeakAttr(dict):
@@ -23,6 +24,15 @@ class UserABC:
     user_avatar: str
     default_avatar: str
     avatar: str
+
+
+class SimpleUser:
+    """A model representing the "simple user" object returned by /bots/{id}/votes."""
+    def __init__(self, **kwargs):
+        self.id = int(kwargs.pop("id"))
+        self.discriminator = kwargs.pop("discriminator")
+        self.username = kwargs.pop("username")
+        self.avatar = kwargs.pop("avatar", None)
 
 
 class User(UserABC):
@@ -93,7 +103,7 @@ class Bot(UserABC):
         self.invite: str = kwargs.pop("invite", None) or invite(str(self.id))
         try:
             self.approved_at: datetime = datetime.strptime(
-                "%Y-%m-%dT%X%fZ",
+                "%Y-%m-%dT%H:%M:%S.%fZ",
                 kwargs.pop("date", "")
             ) or datetime.min
         except ValueError:
@@ -118,3 +128,15 @@ class Bot(UserABC):
         if self._user:
             return self._user
         return state.get_user(self.id)
+
+
+class BotStats:
+    """Model representing 3 fields from /bot/{id}/stats"""
+    def __init__(self, **kwargs):
+        self.server_count = kwargs.pop("server_count", 0)
+        self.shards = {
+            shard_id: server_count
+            for shard_id, server_count in kwargs["shards"].items()
+        }
+        self.shard_count = kwargs.pop("shard_count", 0)
+        self.reliable = self.server_count == sum(self.shards.values())

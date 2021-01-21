@@ -85,8 +85,10 @@ class ColourOptions(dict):
 
 
 # noinspection PyShadowingBuiltins
-def large_widget(id: int, format: str = "svg", *, formatting: ColourOptions) -> str:
+def large_widget(id: int, format: str = "svg", *, formatting: ColourOptions = None) -> str:
     """Generates a URL for the large widget of the provided ID."""
+    if formatting is None:
+        formatting = ColourOptions()
     if format.lower() not in ["png", "svg"]:
         raise TypeError("Widget format must be PNG or SVG.")
 
@@ -96,7 +98,9 @@ def large_widget(id: int, format: str = "svg", *, formatting: ColourOptions) -> 
     return url
 
 
-def small_widget(id: int, format: str = "svg", *, formatting: ColourOptions, key: str):
+def small_widget(id: int, format: str = "svg", *, formatting: ColourOptions = None, key: str):
+    if formatting is None:
+        formatting = ColourOptions()
     valid_keys = ["owner", "status", "upvotes", "servers", "lib"]
     key = key.lower()
     if key not in valid_keys:
