@@ -26,7 +26,8 @@ pip install top.py
 git
 ```shell
 # replace curl with wget, or whatever you use to make web requests
-curl https://github.com/dragdev-studios/top.py/archive/<version>.tar.gz > top.py
+curl https://github.com/dragdev-studios/top.py/archive/<version>.tar.gz > top.py.tar.gz
+tar -xf top.py.tar.gz
 cd top.py
 python3 setup.py install
 ```
