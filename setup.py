@@ -1,4 +1,7 @@
 from setuptools import setup
+from re import compile
+
+version_regex = compile(r"__version__ = (?P<v>[0-9]\.[0-9]\.[0-9])")
 
 with open("requirements.txt") as requirements:
     reqs = requirements.readlines()
@@ -6,9 +9,13 @@ with open("requirements.txt") as requirements:
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
+with open("toppy/client.py") as client:
+    ct = client.read()
+    version = version_regex.search(ct).group("v")
+
 setup(
     name='top.py',
-    version='0.1.0',
+    version=version,
     packages=['toppy', 'toppy.models'],
     url='https://github.com/dragdev-studios/top.py',
     license='MIT',

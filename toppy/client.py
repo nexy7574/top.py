@@ -9,7 +9,7 @@ from .models import Bot, SimpleUser, BotStats
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
 from json import dumps
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 _base_ = "https://top.gg/api"
 
 
