@@ -21,7 +21,11 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     extras_require={
-        "fullmap": ["requests"]
+        "webhook_server": [
+            "uvicorn",
+            "fastapi",
+            "pydantic"
+        ]
     },
     python_requires=">=3.6",
     classifiers=[
