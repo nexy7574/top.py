@@ -9,7 +9,7 @@ from .models import Bot, SimpleUser, BotStats
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
 from json import dumps
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 _base_ = "https://top.gg/api"
 
 
@@ -65,6 +65,8 @@ class TopGG:
             await asyncio.sleep(self.autopost_interval)
 
     async def _request(self, method: str, uri: str, **kwargs):
+        if kwargs.get("data") and isinstance(kwargs["data"], dict):
+            kwargs["data"] = dumps(kwargs["data"])
         fail_if_timeout = kwargs.pop("fail_if_timeout", True)
         expected_codes = kwargs.pop("expected_codes", [200])
         url = _base_ + uri
@@ -91,6 +93,7 @@ class TopGG:
 
             data = await response.json()
             # inject metadata
+            data["_toppy_meta"] = {}
             data["_toppy_meta"]["headers"] = response.headers
             data["_toppy_meta"]["status"] = response.status
         return data

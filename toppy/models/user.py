@@ -16,8 +16,15 @@ class WeakAttr(dict):
             return result
         raise AttributeError("WeakAttr has no attribute '%s'" % item)
 
+class _ReprMixin(object):
+    def __repr__(self):
+        x = self.__class__.__name__ +"("
+        args = ', '.join((f"{x}={y}" for x, y in self.__dict__.items()))
+        x += args + ")"
+        return x
 
-class UserABC:
+
+class UserABC(_ReprMixin):
     id: int
     username: str
     discriminator: str
@@ -25,8 +32,12 @@ class UserABC:
     default_avatar: str
     avatar: str
 
+    def __repr__(self):
+        return f"ABCUser(id={self.id} username={self.username} discriminator={self.discriminator} avatar=" \
+               f"{self.avatar} default={self.default_avatar})"
 
-class SimpleUser:
+
+class SimpleUser(_ReprMixin):
     """A model representing the "simple user" object returned by /bots/{id}/votes."""
     def __init__(self, **kwargs):
         self.id = int(kwargs.pop("id"))
@@ -35,7 +46,7 @@ class SimpleUser:
         self.avatar = kwargs.pop("avatar", None)
 
 
-class User(UserABC):
+class User(UserABC, _ReprMixin):
     """
     Model representing a top.gg user's account.
 
@@ -76,7 +87,7 @@ class User(UserABC):
         return state.get_user(self.id)
 
 
-class Bot(UserABC):
+class Bot(UserABC, _ReprMixin):
     """
     Model representing a top.gg bot
 
@@ -130,7 +141,7 @@ class Bot(UserABC):
         return state.get_user(self.id)
 
 
-class BotStats:
+class BotStats(_ReprMixin):
     """Model representing 3 fields from /bot/{id}/stats"""
     def __init__(self, **kwargs):
         self.server_count = kwargs.pop("server_count", 0)
