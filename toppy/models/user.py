@@ -26,10 +26,10 @@ class _ReprMixin(object):
                 value = attr_value.replace('"', r'\"')
                 args.append(f"{attr_name}=\"{value}\"")
             elif isinstance(attr_value, (tuple, list, set)):
-                args.append(f"{attr_name}=" + '"'+", ".join(attr_value)+'"')
+                args.append(f"{attr_name}=" + '"'+", ".join(map(str, attr_value))+'"')
             else:
                 args.append(f"{attr_name}={repr(attr_value)}")
-        args = ', '.join((shorten(x) for x in args))
+        args = ', '.join((shorten(x, 100) for x in args))
         x += args + ")"
         return x
 
