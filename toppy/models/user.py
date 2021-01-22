@@ -22,7 +22,7 @@ class _ReprMixin(object):
         x = self.__class__.__name__ + "("
         args = []
         for attr_name, attr_value in self.__dict__.items():
-            if isinstance(attr_name, str):
+            if isinstance(attr_value, str):
                 value = attr_value.replace('"', r'\"')
                 args.append(f"{attr_name}=\"{value}\"")
             elif isinstance(attr_value, (tuple, list, set)):
