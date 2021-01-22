@@ -156,7 +156,7 @@ class BotStats(_ReprMixin):
         self.server_count = kwargs.pop("server_count", 0)
         self.shards = {
             shard_id: server_count
-            for shard_id, server_count in kwargs["shards"].items()
+            for shard_id, server_count in enumerate(kwargs["shards"])
         }
         self.shard_count = kwargs.pop("shard_count", 0)
         self.reliable = self.server_count == sum(self.shards.values())
