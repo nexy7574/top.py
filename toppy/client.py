@@ -168,7 +168,7 @@ class TopGG:
             stats["server_count"] = len(self.bot.guilds)
             if hasattr(self.bot, "shards") and self.bot.shards:
                 shards = []
-                for shard in self.bot.shards:
+                for shard in self.bot.shards.values():
                     shards.append(len([x for x in self.bot.guilds if x.shard_id == shard.id]))
                 stats["shards"] = shards
                 stats["shard_count"] = self.bot.shard_count
