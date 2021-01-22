@@ -93,9 +93,10 @@ class TopGG:
 
             data = await response.json()
             # inject metadata
-            data["_toppy_meta"] = {}
-            data["_toppy_meta"]["headers"] = response.headers
-            data["_toppy_meta"]["status"] = response.status
+            data["_toppy_meta"] = {
+                "headers": response.headers,
+                "status": response.status
+            }
         return data
 
     async def fetch_bot(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> Bot:

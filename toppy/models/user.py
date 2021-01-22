@@ -1,10 +1,10 @@
-from discord.abc import User as _UserABC
-from discord import User as DiscordUser
+from datetime import datetime
+from textwrap import shorten
 from typing import Optional, List
+
+from discord import User as DiscordUser
 from discord.colour import Colour
 from discord.utils import oauth_url as invite
-from datetime import datetime
-from aiohttp import ClientSession
 
 
 class WeakAttr(dict):
@@ -16,10 +16,20 @@ class WeakAttr(dict):
             return result
         raise AttributeError("WeakAttr has no attribute '%s'" % item)
 
+
 class _ReprMixin(object):
     def __repr__(self):
-        x = self.__class__.__name__ +"("
-        args = ', '.join((f"{x}={y}" for x, y in self.__dict__.items()))
+        x = self.__class__.__name__ + "("
+        args = []
+        for attr_name, attr_value in self.__dict__.items():
+            if isinstance(attr_name, str):
+                value = attr_value.replace('"', r'\"')
+                args.append(f"{attr_name}=\"{value}\"")
+            elif isinstance(attr_value, (tuple, list, set)):
+                args.append(f"{attr_name}=" + '"'+", ".join(attr_value)+'"')
+            else:
+                args.append(f"{attr_name}={repr(attr_value)}")
+        args = ', '.join((shorten(x) for x in args))
         x += args + ")"
         return x
 
@@ -32,13 +42,10 @@ class UserABC(_ReprMixin):
     default_avatar: str
     avatar: str
 
-    def __repr__(self):
-        return f"ABCUser(id={self.id} username={self.username} discriminator={self.discriminator} avatar=" \
-               f"{self.avatar} default={self.default_avatar})"
-
 
 class SimpleUser(_ReprMixin):
     """A model representing the "simple user" object returned by /bots/{id}/votes."""
+
     def __init__(self, **kwargs):
         self.id = int(kwargs.pop("id"))
         self.discriminator = kwargs.pop("discriminator")
@@ -52,6 +59,7 @@ class User(UserABC, _ReprMixin):
 
     This class conforms to the discord.User ABC.
     """
+
     def __init__(self, **kwargs):
         self.id: int = int(kwargs.pop("id"))
         self.username: str = kwargs.pop("username")
@@ -143,6 +151,7 @@ class Bot(UserABC, _ReprMixin):
 
 class BotStats(_ReprMixin):
     """Model representing 3 fields from /bot/{id}/stats"""
+
     def __init__(self, **kwargs):
         self.server_count = kwargs.pop("server_count", 0)
         self.shards = {
