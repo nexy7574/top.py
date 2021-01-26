@@ -8,6 +8,7 @@ from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from .models import Bot, SimpleUser, BotStats
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
 from json import dumps
+from discord.ext.tasks import loop
 
 __version__ = "0.2.0"
 _base_ = "https://top.gg/api"
@@ -26,16 +27,15 @@ class TopGG:
             bot: Union[C, B, AC, AB],
             *,
             token: str,
-            autopost_every: int = 60
+            autopost_every: int = 60,
+            autopost: bool = True,
+            # account_for_weekend: bool = True
     ):
         self.bot = bot
         self.token = token
+        # self.respect_weekend = account_for_weekend
         # noinspection PyTypeChecker
         self.session = None  # type: aiohttp.ClientSession
-        self.autopost_interval = autopost_every
-        self.autopost_task = None
-        if self.autopost_interval:
-            self.autopost_task = self.bot.loop.create_task(self._autopost())
 
         async def set_session():
             self.session = aiohttp.ClientSession(
@@ -49,20 +49,25 @@ class TopGG:
             # Why is this here?
             # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
         self._session_setter = self.bot.loop.create_task(set_session())
+        if autopost:
+            self.autopost.start()
+
+        # Function aliases
+        self.vote_check = self.upvote_check
+        self.has_upvoted = self.upvote_check
+        self.get_user_vote = self.upvote_check
 
     def __del__(self):
-        if self.autopost_task:
-            self.autopost_task.cancel()
+        self.autopost.stop()
 
     async def _wf_s(self):
         if not self.session:
             await self._session_setter
         return
 
-    async def _autopost(self):
-        while True:
-            await self.post_stats()
-            await asyncio.sleep(self.autopost_interval)
+    @loop(minutes=30)
+    async def autopost(self):
+        await self.post_stats()
 
     async def _request(self, method: str, uri: str, **kwargs):
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
@@ -180,3 +185,13 @@ class TopGG:
             fail_if_timeout=fail_if_ratelimited
         )
         return stats["server_count"]
+
+    async def is_weekend(self) -> bool:
+        """Returns True or False, depending on if it's a "weekend".
+
+        If it's a weekend, votes count as double."""
+        data = await self._request(
+            "GET",
+            f"/weekend"
+        )
+        return data["is_weekend"]
