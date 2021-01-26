@@ -10,7 +10,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from json import dumps
 from discord.ext.tasks import loop
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"
 _base_ = "https://top.gg/api"
 
 
