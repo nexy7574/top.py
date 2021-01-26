@@ -98,10 +98,11 @@ class TopGG:
 
             data = await response.json()
             # inject metadata
-            data["_toppy_meta"] = {
-                "headers": response.headers,
-                "status": response.status
-            }
+            if isinstance(data, dict):
+                data["_toppy_meta"] = {
+                    "headers": response.headers,
+                    "status": response.status
+                }
         return data
 
     async def fetch_bot(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> Bot:
@@ -116,7 +117,7 @@ class TopGG:
         response["state"] = self.bot
         return Bot(**response)
 
-    async def fetch_bots(self, limit: int = 50, search: dict = None, sort: str = None,
+    async def fetch_bots(self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None,
                          fail_if_ratelimited: bool = True) -> dict:
         limit = max(2, min(500, limit))
         uri = "/bots?limit="+str(limit)
@@ -125,6 +126,8 @@ class TopGG:
             uri += "&search="+search
         if sort:
             uri += "&sort="+sort
+        if offset:
+            uri += "&offset="+str(offset)
         result = await self._request("GET", "/bots", fail_if_timeout=fail_if_ratelimited)
         new_results = []
         for bot in result["results"]:
@@ -132,6 +135,26 @@ class TopGG:
             new_results.append(Bot(**bot))
         result["results"] = new_results
         return result
+
+    async def bulk_fetch_bots(self, limit: int = 500, *args) -> dict:
+        """Similar to fetch_bots, except allows for requesting more than 500.
+
+        This is equivalent to:
+        ```python
+        batch_one = await TopGG.fetch_bots(500)
+        batch_two = await TopGG.fetch_bots(500, offset=500)
+        batch_three = await TopGG.fetch_bots(500, offset=1000)
+        ...
+        ```
+        """
+        results = {}
+        remaining = limit
+        for i in range(0, limit, 500):
+            amount = min(500, remaining)
+            batch_results = await self.fetch_bots(amount, offset=i, *args)
+            remaining -= amount
+            results = {**results, **batch_results}
+        return results
 
     async def fetch_votes(self, *, fail_if_ratelimited: bool = True) -> List[SimpleUser]:
         """Fetches the last 1000 voters for your bot."""
