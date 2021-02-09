@@ -8,6 +8,7 @@ class Forbidden(ToppyError):
 
 class Ratelimited(ToppyError):
     """Raised whenever the client is ratelimited for a long time and refused to handle it."""
+
     def __init__(self, retry_after: float = 0.0):
         self.retry_after = retry_after
 

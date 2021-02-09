@@ -21,13 +21,13 @@ except ImportError:
 try:
     from pydantic import BaseModel
 
-
     class VotePayload(BaseModel):
         bot: str
         user: str
         type: str
         isWeekend: bool
         query: str = None
+
 
 except ImportError:
     logging.warning("pydantic is not installed. The webhook server will be unsupported.")
@@ -48,12 +48,7 @@ class WebhookServer:
     async def on_vote_request(self, req: Request, body: VotePayload, Authorization: str = Header(...)):
         if self.auth and self.auth != Authorization:
             logging.debug(f"Rejecting incoming vote request from {req.client.host} ({body}) due to incorrect auth.")
-            return JSONResponse(
-                {
-                    "message": "Incorrect authorization."
-                },
-                401
-            )
+            return JSONResponse({"message": "Incorrect authorization."}, 401)
 
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
@@ -66,19 +61,14 @@ class WebhookServer:
                 "user": self.bot.get_user(int(body.user)) or int(body.user),
                 "type": "vote",
                 "is_weekend": body.isWeekend,
-                "query": body.query
+                "query": body.query,
             }
             self.bot.dispatch("dbl_vote", data)
             self.bot.dispatch("dbl_vote_raw", body)
-        return JSONResponse(
-            {
-                "message": "Accepted."
-            },
-            202
-        )
+        return JSONResponse({"message": "Accepted."}, 202)
 
 
-def start_webhook_server(bot, host: str = "127.0.0.1", path = "/vote", port = 8080, auth: str = None) -> Task:
+def start_webhook_server(bot, host: str = "127.0.0.1", path="/vote", port=8080, auth: str = None) -> Task:
     """
     Starts the webhook server.
 
@@ -100,7 +90,7 @@ def start_webhook_server(bot, host: str = "127.0.0.1", path = "/vote", port = 80
         lifespan="on",
         access_log=False,
         use_colors=False,
-        forwarded_allow_ips=["*"]
+        forwarded_allow_ips=["*"],
     )
     config.setup_event_loop()
     server = Server(config)

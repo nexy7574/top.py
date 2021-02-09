@@ -23,13 +23,13 @@ class _ReprMixin(object):
         args = []
         for attr_name, attr_value in self.__dict__.items():
             if isinstance(attr_value, str):
-                value = attr_value.replace('"', r'\"')
-                args.append(f"{attr_name}=\"{value}\"")
+                value = attr_value.replace('"', r"\"")
+                args.append(f'{attr_name}="{value}"')
             elif isinstance(attr_value, (tuple, list, set)):
-                args.append(f"{attr_name}=" + '"'+", ".join(map(str, attr_value))+'"')
+                args.append(f"{attr_name}=" + '"' + ", ".join(map(str, attr_value)) + '"')
             else:
                 args.append(f"{attr_name}={repr(attr_value)}")
-        args = ', '.join((shorten(x, 100) for x in args))
+        args = ", ".join((shorten(x, 100) for x in args))
         x += args + ")"
         return x
 
@@ -84,7 +84,7 @@ class User(UserABC, _ReprMixin):
         else:
             self._user: Optional[DiscordUser] = None
 
-    def user(self, state = None) -> Optional[DiscordUser]:
+    def user(self, state=None) -> Optional[DiscordUser]:
         """Gets the current discord user object from the top.gg user object.
 
         state can be the bot/client instance, or anything with a get_user method."""
@@ -121,10 +121,9 @@ class Bot(UserABC, _ReprMixin):
         self.featured_guilds: List[int] = list(map(int, kwargs.pop("guilds", [])))
         self.invite: str = kwargs.pop("invite", None) or invite(str(self.id))
         try:
-            self.approved_at: datetime = datetime.strptime(
-                "%Y-%m-%dT%H:%M:%S.%fZ",
-                kwargs.pop("date", "")
-            ) or datetime.min
+            self.approved_at: datetime = (
+                datetime.strptime("%Y-%m-%dT%H:%M:%S.%fZ", kwargs.pop("date", "")) or datetime.min
+            )
         except ValueError:
             self.approved_at = datetime.min
         self.certified: bool = kwargs.pop("certifiedBot", False)
@@ -138,7 +137,7 @@ class Bot(UserABC, _ReprMixin):
         else:
             self._user: Optional[DiscordUser] = None
 
-    def user(self, state = None) -> Optional[DiscordUser]:
+    def user(self, state=None) -> Optional[DiscordUser]:
         """Gets the current discord user object from the top.gg user object.
 
         state can be the bot/client instance, or anything with a get_user method."""
@@ -154,9 +153,6 @@ class BotStats(_ReprMixin):
 
     def __init__(self, **kwargs):
         self.server_count = kwargs.pop("server_count", 0)
-        self.shards = {
-            shard_id: server_count
-            for shard_id, server_count in enumerate(kwargs["shards"])
-        }
+        self.shards = {shard_id: server_count for shard_id, server_count in enumerate(kwargs["shards"])}
         self.shard_count = kwargs.pop("shard_count", 0)
         self.reliable = self.server_count == sum(self.shards.values())

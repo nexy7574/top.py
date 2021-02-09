@@ -3,8 +3,10 @@ from json import dumps
 from typing import Union, List
 
 import aiohttp
+
 # noinspection PyPep8Naming
 from discord import Client as C, AutoShardedClient as AC
+
 # noinspection PyPep8Naming
 from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
@@ -26,12 +28,7 @@ class TopGG:
     """
 
     def __init__(
-            self,
-            bot: Union[C, B, AC, AB],
-            *,
-            token: str,
-            autopost: bool = True,
-            ignore_local_ratelimit: bool = False
+        self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True, ignore_local_ratelimit: bool = False
     ):
         self.bot = bot
         self.token = token
@@ -45,7 +42,7 @@ class TopGG:
                     "User-Agent": f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
                     "Authorization": self.token,
                     "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    "Accept": "application/json",
                 }
             )
 
@@ -104,10 +101,7 @@ class TopGG:
                 data = await response.json()
                 # inject metadata
                 if isinstance(data, dict):
-                    data["_toppy_meta"] = {
-                        "headers": response.headers,
-                        "status": response.status
-                    }
+                    data["_toppy_meta"] = {"headers": response.headers, "status": response.status}
             return data
 
         try:
@@ -129,8 +123,9 @@ class TopGG:
         response["state"] = self.bot
         return Bot(**response)
 
-    async def fetch_bots(self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None,
-                         fail_if_ratelimited: bool = True) -> dict:
+    async def fetch_bots(
+        self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None, fail_if_ratelimited: bool = True
+    ) -> dict:
         limit = max(2, min(500, limit))
         uri = "/bots?limit=" + str(limit)
         if search:
@@ -214,10 +209,7 @@ class TopGG:
                 stats["shard_count"] = self.bot.shard_count
 
         await self._request(
-            "POST",
-            f"/bots/{self.bot.user.id}/stats",
-            data=dumps(stats),
-            fail_if_timeout=fail_if_ratelimited
+            "POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats), fail_if_timeout=fail_if_ratelimited
         )
         return stats["server_count"]
 
@@ -225,8 +217,5 @@ class TopGG:
         """Returns True or False, depending on if it's a "weekend".
 
         If it's a weekend, votes count as double."""
-        data = await self._request(
-            "GET",
-            f"/weekend"
-        )
+        data = await self._request("GET", f"/weekend")
         return data["is_weekend"]
