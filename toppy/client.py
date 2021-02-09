@@ -1,16 +1,19 @@
-import aiohttp
 import asyncio
+from json import dumps
 from typing import Union, List
+
+import aiohttp
 # noinspection PyPep8Naming
 from discord import Client as C, AutoShardedClient as AC
 # noinspection PyPep8Naming
 from discord.ext.commands import Bot as B, AutoShardedBot as AB
-from .models import Bot, SimpleUser, BotStats
-from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
-from json import dumps
 from discord.ext.tasks import loop
+from ratelimit import limits, RateLimitException
 
-__version__ = "1.0.0"
+from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
+from .models import Bot, SimpleUser, BotStats
+
+__version__ = "1.0.1"
 _base_ = "https://top.gg/api"
 
 
@@ -27,13 +30,12 @@ class TopGG:
             bot: Union[C, B, AC, AB],
             *,
             token: str,
-            autopost_every: int = 60,
             autopost: bool = True,
-            # account_for_weekend: bool = True
+            ignore_local_ratelimit: bool = False
     ):
         self.bot = bot
         self.token = token
-        # self.respect_weekend = account_for_weekend
+        self.ignore_local_ratelimit = ignore_local_ratelimit
         # noinspection PyTypeChecker
         self.session = None  # type: aiohttp.ClientSession
 
@@ -46,8 +48,9 @@ class TopGG:
                     "Accept": "application/json"
                 }
             )
-            # Why is this here?
-            # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
+
+        # Why is this here?
+        # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
         self._session_setter = self.bot.loop.create_task(set_session())
         if autopost:
             self.autopost.start()
@@ -70,40 +73,49 @@ class TopGG:
         await self.post_stats()
 
     async def _request(self, method: str, uri: str, **kwargs):
-        if kwargs.get("data") and isinstance(kwargs["data"], dict):
-            kwargs["data"] = dumps(kwargs["data"])
-        fail_if_timeout = kwargs.pop("fail_if_timeout", True)
-        expected_codes = kwargs.pop("expected_codes", [200])
-        url = _base_ + uri
-        await self._wf_s()
+        @limits(60, 3600)
+        async def __request():
+            if kwargs.get("data") and isinstance(kwargs["data"], dict):
+                kwargs["data"] = dumps(kwargs["data"])
+            fail_if_timeout = kwargs.pop("fail_if_timeout", True)
+            expected_codes = kwargs.pop("expected_codes", [200])
+            url = _base_ + uri
+            await self._wf_s()
 
-        async with self.session.request(method, url, **kwargs) as response:
-            if "application/json" not in response.headers.get("content-type", "none").lower():
-                raise ToppyError("Unexpected response from server.")
-            if response.status in [403, 401]:
-                raise Forbidden()
-            if response.status in range(500, 600):
-                raise TopGGServerError()
-            if response.status == 429:
+            async with self.session.request(method, url, **kwargs) as response:
+                if "application/json" not in response.headers.get("content-type", "none").lower():
+                    raise ToppyError("Unexpected response from server.")
+                if response.status in [403, 401]:
+                    raise Forbidden()
+                if response.status in range(500, 600):
+                    raise TopGGServerError()
+                if response.status == 429:
+                    data = await response.json()
+                    if fail_if_timeout:
+                        raise Ratelimited(data["retry-after"])
+                    else:
+                        await asyncio.sleep(data.get("retry-after", 3600))
+                        return await self._request(method, uri, **kwargs)
+                if response.status == 404:
+                    raise NotFound()
+                if response.status not in expected_codes:
+                    raise ToppyError("Unexpected status code '{}'".format(str(response.status)))
+
                 data = await response.json()
-                if fail_if_timeout:
-                    raise Ratelimited(data["retry-after"])
-                else:
-                    await asyncio.sleep(data.get("retry-after", 3600))
-                    return await self._request(method, uri, **kwargs)
-            if response.status == 404:
-                raise NotFound()
-            if response.status not in expected_codes:
-                raise ToppyError("Unexpected status code '{}'".format(str(response.status)))
+                # inject metadata
+                if isinstance(data, dict):
+                    data["_toppy_meta"] = {
+                        "headers": response.headers,
+                        "status": response.status
+                    }
+            return data
 
-            data = await response.json()
-            # inject metadata
-            if isinstance(data, dict):
-                data["_toppy_meta"] = {
-                    "headers": response.headers,
-                    "status": response.status
-                }
-        return data
+        try:
+            return await __request()
+        except RateLimitException:
+            if self.ignore_local_ratelimit:
+                return {}
+            raise
 
     async def fetch_bot(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> Bot:
         """
@@ -113,21 +125,21 @@ class TopGG:
         :param fail_if_ratelimited: Whether to raise an error if we get ratelimited or just wait an hour
         :return: A bot model
         """
-        response = await self._request("GET", "/bots/"+str(bot_id), fail_if_timeout=fail_if_ratelimited)
+        response = await self._request("GET", "/bots/" + str(bot_id), fail_if_timeout=fail_if_ratelimited)
         response["state"] = self.bot
         return Bot(**response)
 
     async def fetch_bots(self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None,
                          fail_if_ratelimited: bool = True) -> dict:
         limit = max(2, min(500, limit))
-        uri = "/bots?limit="+str(limit)
+        uri = "/bots?limit=" + str(limit)
         if search:
             search = ", ".join(f"{x}: {y}" for x, y in search.items())
-            uri += "&search="+search
+            uri += "&search=" + search
         if sort:
-            uri += "&sort="+sort
+            uri += "&sort=" + sort
         if offset:
-            uri += "&offset="+str(offset)
+            uri += "&offset=" + str(offset)
         result = await self._request("GET", "/bots", fail_if_timeout=fail_if_ratelimited)
         new_results = []
         for bot in result["results"]:
