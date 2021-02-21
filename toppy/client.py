@@ -16,6 +16,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from .models import Bot, SimpleUser, BotStats
 
 __version__ = "1.0.1"
+__api_version__ = "v0"
 _base_ = "https://top.gg/api"
 
 
