@@ -16,7 +16,7 @@ with open("toppy/client.py") as client:
 setup(
     name="top.py",
     version=version,
-    packages=["toppy", "toppy.models", "toppy.errors"],
+    packages=["toppy", "toppy.models", "toppy.errors", "toppy.ratelimiter"],
     url="https://github.com/dragdev-studios/top.py",
     license="MIT",
     author="EEKIM10",

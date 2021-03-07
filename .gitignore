@@ -235,3 +235,4 @@ dmypy.json
 .github
 upload.bat
 test.py
+results.txt
