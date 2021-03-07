@@ -53,7 +53,8 @@ class TopGGCog(commands.Cog):
         self.bot = bot
         self.top_gg = TopGG(
             self.bot,
-            token="example-token-please-replace"
+            token="example-token-please-replace",
+            autopost=False
         )
 
     @commands.command()
