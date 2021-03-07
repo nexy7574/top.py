@@ -41,7 +41,7 @@ python3 setup.py install
 ```
 
 ## Usage
-*Documentation can be found in the github's [wiki](https://github.com/dragdev-studios/top.py/wiki)*
+*Full documentation can be found by running `{python} -m pydoc toppy -b`, replacing `{python}` with whatever command you use to run python.*
 
 ```python
 from toppy.client import TopGG
