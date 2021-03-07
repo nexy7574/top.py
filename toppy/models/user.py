@@ -48,7 +48,7 @@ class SimpleUser(_ReprMixin):
 
     def __init__(self, **kwargs):
         self.id = int(kwargs.pop("id"))
-        self.discriminator = kwargs.pop("discriminator")
+        self.discriminator = kwargs.pop("discriminator", "#0000")
         self.username = kwargs.pop("username")
         self.avatar = kwargs.pop("avatar", None)
 
@@ -113,7 +113,7 @@ class Bot(UserABC, _ReprMixin):
         self.prefix: str = kwargs.pop("prefix")
         self.short_description: str = kwargs.pop("shortdesc")
         self.long_description: Optional[str] = kwargs.pop("longdesc", None)  # NOTE: this can be empty for some reason
-        self.tags: List[str] = kwargs.pop("tags")
+        self.tags: List[str] = kwargs.pop("tags", [])
         self.website: Optional[str] = kwargs.pop("website", None)
         self.support: Optional[str] = kwargs.pop("support", None)
         self.github: Optional[str] = kwargs.pop("github", None)
@@ -153,6 +153,9 @@ class BotStats(_ReprMixin):
 
     def __init__(self, **kwargs):
         self.server_count = kwargs.pop("server_count", 0)
-        self.shards = {shard_id: server_count for shard_id, server_count in enumerate(kwargs["shards"])}
+        if kwargs.get("shards"):
+            self.shards = {shard_id: server_count for shard_id, server_count in enumerate(kwargs["shards"])}
+        else:
+            self.shards = {0: self.server_count}
         self.shard_count = kwargs.pop("shard_count", 0)
         self.reliable = self.server_count == sum(self.shards.values())
