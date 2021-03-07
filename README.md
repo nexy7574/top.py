@@ -7,7 +7,7 @@
 ![api coverage: 100%](https://img.shields.io/badge/top.gg%20api%20coverage-100%25-blue?style=flat-square)
 
 
-A modern python module wrapper for the official [top.gg API](https://top.gg/api/docs).
+A modern python module wrapper for the official [top.gg API](https://docs.top.gg).
 
 **THIS MODULE IS NOT ENDORSED BY TOP.GG.** Their official package is [here](https://pypi.org/project/dblpy).
 
