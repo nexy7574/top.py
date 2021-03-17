@@ -7,27 +7,6 @@ from discord.colour import Colour
 from discord.utils import oauth_url as invite
 
 
-def calculate_avatar_url(user_id: int, discriminator: int, avatar_hash: str, *, default=...) -> str:
-    if not avatar_hash:
-        if default is ...:
-            return f"https://cdn.discordapp.com/embed/avatars/{discriminator % 5}.png"
-        return default
-    fmt = "png"
-    if avatar_hash.startswith("a_"):
-        fmt = "gif"
-    return f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.{fmt}"
-
-
-class WeakAttr(dict):
-    """A simple class that takes a dictionary and allows fetching of items through attributes."""
-
-    def __getattr__(self, item):
-        result = self.get(item)
-        if result:
-            return result
-        raise AttributeError("WeakAttr has no attribute '%s'" % item)
-
-
 class _ReprMixin(object):
     def __repr__(self):
         x = self.__class__.__name__ + "("
@@ -43,6 +22,27 @@ class _ReprMixin(object):
         args = ", ".join((shorten(x, 100) for x in args))
         x += args + ")"
         return x
+
+
+def calculate_avatar_url(user_id: int, discriminator: int, avatar_hash: str, *, default=...) -> str:
+    if not avatar_hash:
+        if default is ...:
+            return f"https://cdn.discordapp.com/embed/avatars/{discriminator % 5}.png"
+        return default
+    fmt = "png"
+    if avatar_hash.startswith("a_"):
+        fmt = "gif"
+    return f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.{fmt}"
+
+
+class WeakAttr(dict, _ReprMixin):
+    """A simple class that takes a dictionary and allows fetching of items through attributes."""
+
+    def __getattr__(self, item):
+        result = self.get(item)
+        if result:
+            return result
+        raise AttributeError("WeakAttr has no attribute '%s'" % item)
 
 
 class UserABC(_ReprMixin):
