@@ -27,5 +27,5 @@ class Ratelimit:
 
 _routes = {
     "*": Ratelimit(route="*", hits=100, cooldown=3600),
-    "/bots/*": Ratelimit(route="/bots/*", hits=60, cooldown=3600)
+    "/bots/*": Ratelimit(route="/bots/*", hits=60, cooldown=3600),
 }

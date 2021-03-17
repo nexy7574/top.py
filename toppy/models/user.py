@@ -7,6 +7,17 @@ from discord.colour import Colour
 from discord.utils import oauth_url as invite
 
 
+def calculate_avatar_url(user_id: int, discriminator: int, avatar_hash: str, *, default=...) -> str:
+    if not avatar_hash:
+        if default is ...:
+            return f"https://cdn.discordapp.com/embed/avatars/{discriminator % 5}.png"
+        return default
+    fmt = "png"
+    if avatar_hash.startswith("a_"):
+        fmt = "gif"
+    return f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.{fmt}"
+
+
 class WeakAttr(dict):
     """A simple class that takes a dictionary and allows fetching of items through attributes."""
 
@@ -42,15 +53,23 @@ class UserABC(_ReprMixin):
     default_avatar: str
     avatar: str
 
+    def user(self, state=None):
+        """Gets the current discord user object from the top.gg user object.
+
+        state can be the bot/client instance, or anything with a get_user method."""
+        raise NotImplementedError
+
 
 class SimpleUser(_ReprMixin):
     """A model representing the "simple user" object returned by /bots/{id}/votes."""
 
     def __init__(self, **kwargs):
-        self.id = int(kwargs.pop("id"))
-        self.discriminator = kwargs.pop("discriminator", "#0000")
-        self.username = kwargs.pop("username")
-        self.avatar = kwargs.pop("avatar", None)
+        self.id: int = int(kwargs.pop("id"))
+        self.discriminator: str = kwargs.pop("discriminator", "#0000")
+        self.username: str = kwargs.pop("username")
+        self.avatar: Optional[str] = calculate_avatar_url(
+            self.id, int(self.discriminator[1:]), kwargs.pop("avatar", None)
+        )
 
 
 class User(UserABC, _ReprMixin):
@@ -64,12 +83,14 @@ class User(UserABC, _ReprMixin):
         self.id: int = int(kwargs.pop("id"))
         self.username: str = kwargs.pop("username")
         self.discriminator: str = kwargs.pop("discriminator")
-        self.user_avatar: Optional[str] = kwargs.pop("avatar", None)
-        self.default_avatar: str = kwargs.pop("defAvatar")
+        self.user_avatar: Optional[str] = calculate_avatar_url(
+            self.id, int(self.discriminator), kwargs.pop("avatar", None), default=None
+        )
+        self.default_avatar: str = calculate_avatar_url(self.id, int(self.discriminator), kwargs.pop("defAvatar"))
         self.avatar: str = self.user_avatar or self.default_avatar
         self.bio: Optional[str] = kwargs.pop("bio", None)
         self.banner_url: Optional[str] = kwargs.pop("banner", None)
-        self.socials: WeakAttr = WeakAttr(kwargs.pop("social"))
+        self.socials: WeakAttr = WeakAttr(kwargs.pop("social", {}))
         self._raw_colour = (kwargs.get("color", "0") or "0").lstrip("#")  # can be empty, for some reason.
         self.colour: Colour = Colour(int(self._raw_colour, base=16))
         self.color: Colour = self.colour
@@ -152,10 +173,10 @@ class BotStats(_ReprMixin):
     """Model representing 3 fields from /bot/{id}/stats"""
 
     def __init__(self, **kwargs):
-        self.server_count = kwargs.pop("server_count", 0)
+        self.server_count: int = kwargs.pop("server_count", 0)
         if kwargs.get("shards"):
             self.shards = {shard_id: server_count for shard_id, server_count in enumerate(kwargs["shards"])}
         else:
             self.shards = {0: self.server_count}
-        self.shard_count = kwargs.pop("shard_count", 0)
-        self.reliable = self.server_count == sum(self.shards.values())
+        self.shard_count: int = kwargs.pop("shard_count", 0)
+        self.reliable: bool = self.server_count == sum(self.shards.values())

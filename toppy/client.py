@@ -4,19 +4,20 @@ from typing import Union, List
 
 import aiohttp
 
+import discord
+
 # noinspection PyPep8Naming
 from discord import Client as C, AutoShardedClient as AC
 
 # noinspection PyPep8Naming
 from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
-from ratelimit import limits, RateLimitException
 
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
-from .models import Bot, SimpleUser, BotStats
+from .models import Bot, SimpleUser, BotStats, User
 from .ratelimiter import routes
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
 
@@ -222,3 +223,8 @@ class TopGG:
         If it's a weekend, votes count as double."""
         data = await self._request("GET", f"/weekend")
         return data["is_weekend"]
+
+    async def fetch_user(self, user: Union[discord.User, discord.Object]) -> User:
+        """Fetches a user's profile from top.gg."""
+        data = await self._request("GET", f"/users/{user.id}")
+        return User(**data, state=self.bot)
