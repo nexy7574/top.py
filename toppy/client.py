@@ -14,7 +14,7 @@ from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
 
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
-from .models import Bot, SimpleUser, BotStats, User
+from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
 
 __version__ = "1.1.0"
@@ -33,6 +33,14 @@ class TopGG:
     def __init__(
         self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True, ignore_local_ratelimit: bool = False
     ):
+        """
+        Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
+
+        :param bot: The "bot" instance to use. Can be one of (AutoSharded)[Bot|Client]. Bot is preferred.
+        :param token: Your top.gg API token.
+        :param autopost: Boolean indicating if to automatically publish stats every 30 minutes or not.
+        :param ignore_local_ratelimit: Boolean telling the class if it should ignore experimental localised ratelimiting
+        """
         self.bot = bot
         self.token = token
         self.ignore_local_ratelimit = ignore_local_ratelimit
@@ -61,6 +69,7 @@ class TopGG:
         self.get_user_vote = self.upvote_check
 
     def __del__(self):
+        """Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
         self.autopost.stop()
 
     async def _wf_s(self):
@@ -70,9 +79,10 @@ class TopGG:
 
     @loop(minutes=30)
     async def autopost(self):
+        """The task that automatically posts our stats to top.gg"""
         await self.post_stats()
 
-    async def _request(self, method: str, uri: str, **kwargs):
+    async def _request(self, method: str, uri: str, **kwargs) -> dict:
         if not self.ignore_local_ratelimit:
             if "/bots/" in uri:
                 rlc = routes["/bots/*"]
@@ -89,12 +99,19 @@ class TopGG:
         await self._wf_s()
 
         async with self.session.request(method, url, **kwargs) as response:
+            if response.status in range(500, 600):
+                raise TopGGServerError()
+            else:
+                # NOTE: This has moved from just before the return since the hits count as soon as a response
+                # is generated (unless it's 5xx).
+                if "/bots/" in uri:
+                    routes["/bots/*"].add_hit()
+                routes["*"].add_hit()
+
             if "application/json" not in response.headers.get("content-type", "none").lower():
                 raise ToppyError("Unexpected response from server.")
             if response.status in [403, 401]:
                 raise Forbidden()
-            if response.status in range(500, 600):
-                raise TopGGServerError()
             if response.status == 429:
                 data = await response.json()
                 if fail_if_timeout:
@@ -111,9 +128,6 @@ class TopGG:
             # inject metadata
             if isinstance(data, dict):
                 data["_toppy_meta"] = {"headers": response.headers, "status": response.status}
-        if "/bots/" in uri:
-            routes["/bots/*"].add_hit()
-        routes["*"].add_hit()
         return data
 
     async def fetch_bot(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> Bot:
@@ -130,7 +144,17 @@ class TopGG:
 
     async def fetch_bots(
         self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None, fail_if_ratelimited: bool = True
-    ) -> dict:
+    ) -> BotSearchResults:
+        """
+        Fetches up to :limit: bots from top.gg
+
+        :param limit: How many bots to fetch.
+        :param offset: How many bots to "skip" (pagination)
+        :param search: Search pairs (e.g. {"library": "discord.py"})
+        :param sort: What field to sort by. Prefix with dash to reverse results.
+        :param fail_if_ratelimited: Deprecated.
+        :return: A BotSearchResults object
+        """
         limit = max(2, min(500, limit))
         uri = "/bots?limit=" + str(limit)
         if search:
@@ -145,8 +169,7 @@ class TopGG:
         for bot in result["results"]:
             bot["state"] = self.bot
             new_results.append(Bot(**bot))
-        result["results"] = new_results
-        return result
+        return BotSearchResults(*new_results, limit=limit, offset=offset)
 
     async def bulk_fetch_bots(self, limit: int = 500, *args) -> dict:
         """Similar to fetch_bots, except allows for requesting more than 500.

@@ -1,6 +1,7 @@
+import warnings
 from datetime import datetime
 from textwrap import shorten
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from discord import User as DiscordUser
 from discord.colour import Colour
@@ -167,6 +168,33 @@ class Bot(UserABC, _ReprMixin):
         if self._user:
             return self._user
         return state.get_user(self.id)
+
+
+class BotSearchResults(_ReprMixin):
+    """A class returned solely by TopGG.[bulk_]fetch_bots.
+
+    Iterating will iterate through the bot results."""
+    # We love linting.
+    results: Tuple[Bot]
+    limit: int
+    offset: int
+    count: int
+    total: int
+
+    def __init__(self, *results: Bot, limit: int, offset: int):
+        self.results = results
+        self.limit = limit
+        self.offset = offset
+        self.count = len(results)
+        self.total = self.count
+
+    def __getitem__(self, item):
+        raise DeprecationWarning("[bulk_]fetch_bots no-longer returns a dictionary, and it looks like you treat it "
+                                 "as such. You should now use iter(results) (to iterate results) or use one of "
+                                 "the attributes.")
+
+    def __iter__(self):
+        return self.results
 
 
 class BotStats(_ReprMixin):
