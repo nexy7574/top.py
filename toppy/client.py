@@ -73,12 +73,13 @@ class TopGG:
         await self.post_stats()
 
     async def _request(self, method: str, uri: str, **kwargs):
-        if "/bots/" in uri:
-            rlc = routes["/bots/*"]
-            if rlc.ratelimited:
-                raise Ratelimited(rlc.retry_after)
-        if routes["*"].ratelimited:
-            raise Ratelimited(routes["*"].retry_after)
+        if not self.ignore_local_ratelimit:
+            if "/bots/" in uri:
+                rlc = routes["/bots/*"]
+                if rlc.ratelimited:
+                    raise Ratelimited(rlc.retry_after)
+            if routes["*"].ratelimited:
+                raise Ratelimited(routes["*"].retry_after)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
             kwargs["data"] = dumps(kwargs["data"])
