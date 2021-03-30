@@ -6,14 +6,14 @@ def _create_callback(bot, auth):
     async def callback(request: web.Request):
         if auth:
             if request.headers.get("Authorization", "") != auth:
-                return web.Response(body={"detail": "unauthorized."}, status=401)
+                return web.Response(body='{"detail": "unauthorized."}', status=401)
         bot.dispatch("vote", Vote(await request.json()))
-        return web.Response(body={"detail": "accepted"})
+        return web.Response(body='{"detail": "accepted"}')
 
     return callback
 
 
-def create_server(bot, *, host: str = "127.0.0.1", port: int = 8080, path: str = "/", auth: str = None):
+async def create_server(bot, *, host: str = "127.0.0.1", port: int = 8080, path: str = "/", auth: str = None):
     """
     Creates a vote webhook server.
     This will listen for webhooks on <host>:<port>[/<path>].
@@ -28,4 +28,7 @@ def create_server(bot, *, host: str = "127.0.0.1", port: int = 8080, path: str =
     """
     app = web.Application()
     app.add_routes([web.post(path, _create_callback(bot, auth))])
-    return bot.loop.create_task(bot.loop.run_in_executor(web.run_app, app, host=host, port=port))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    webserver = web.TCPSite(runner, host, port)
+    return bot.loop.create_task(webserver.start())
