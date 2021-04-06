@@ -26,7 +26,6 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=reqs,
-    extras_require={"webhook_server": ["uvicorn", "fastapi", "pydantic"]},
     python_requires=">=3.6",
     classifiers=[
         "Intended Audience :: Developers",
