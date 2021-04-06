@@ -59,7 +59,11 @@ class TopGG:
 
         # Why is this here?
         # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
-        self._session_setter = self.bot.loop.create_task(set_session())
+        if not self.bot.loop.is_running():
+            self.bot.loop.run_until_complete(set_session())
+        else:
+            self._session_setter = self.bot.loop.create_task(set_session())
+
         if autopost:
             self.autopost.start()
 
