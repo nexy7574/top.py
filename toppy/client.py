@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from json import dumps
 from typing import Union, List
 
@@ -20,6 +21,7 @@ from .ratelimiter import routes
 __version__ = "1.1.1"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
+logger = logging.getLogger(__name__)
 
 
 class TopGG:
@@ -60,11 +62,14 @@ class TopGG:
         # Why is this here?
         # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
         if not self.bot.loop.is_running():
+            logger.debug("Stealing idle loop to create aiohttp session.")
             self.bot.loop.run_until_complete(set_session())
         else:
+            logger.debug("Loop is in use - creating task to create aiohttp session.")
             self._session_setter = self.bot.loop.create_task(set_session())
 
         if autopost:
+            logger.debug("Starting autopost task.")
             self.autopost.start()
 
         # Function aliases
@@ -72,36 +77,50 @@ class TopGG:
         self.has_upvoted = self.upvote_check
         self.get_user_vote = self.upvote_check
 
+        logger.debug(
+            f"TopGG [top.py] has been initialised:\n\t- bot: {id(self.bot)}\n\t- API Token: {self.token[:5]}...\n\t"
+            f"- Session: {id(self.session) if self.session else None}\n\t- Autoposting stats? "
+            f"{ {True: 'Y', False: 'N'}[autopost]}\n"
+        )
+
     def __del__(self):
         """Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
+        logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
 
     async def _wf_s(self):
         if not self.session:
+            logger.warning("self does not contain an aiohttp session. Forcing session setter task to run now.")
             await self._session_setter
         return
 
     @loop(minutes=30)
     async def autopost(self):
         """The task that automatically posts our stats to top.gg"""
-        await self.post_stats()
+        result = await self.post_stats()
+        self.bot.dispatch("toppy_stat_autopost", result)
 
     async def _request(self, method: str, uri: str, **kwargs) -> dict:
         if not self.ignore_local_ratelimit:
             if "/bots/" in uri:
                 rlc = routes["/bots/*"]
                 if rlc.ratelimited:
+                    logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
                     raise Ratelimited(rlc.retry_after)
             if routes["*"].ratelimited:
+                logger.warning(f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
+                               f" Perhaps review how many requests you're sending?")
                 raise Ratelimited(routes["*"].retry_after)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
             kwargs["data"] = dumps(kwargs["data"])
+
         fail_if_timeout = kwargs.pop("fail_if_timeout", True)
         expected_codes = kwargs.pop("expected_codes", [200])
         url = _base_ + uri
         await self._wf_s()
 
+        logger.info("Sending \"{} {}\"...".format(method, url))
         async with self.session.request(method, url, **kwargs) as response:
             if response.status in range(500, 600):
                 raise TopGGServerError()
@@ -113,14 +132,27 @@ class TopGG:
                 routes["*"].add_hit()
 
             if "application/json" not in response.headers.get("content-type", "none").lower():
+                logger.warning(f"Got unexpected mime type {response.headers['Content-Type']} from top.gg.")
                 raise ToppyError("Unexpected response from server.")
             if response.status in [403, 401]:
                 raise Forbidden()
             if response.status == 429:
+                logging.warning("Unexpected ratelimit. Re-syncing internal ratelimit handler (unless that's disabled).")
                 data = await response.json()
+                if not self.ignore_local_ratelimit:
+                    if "/bots/" in uri:
+                        routes["/bots/*"].sync_from_ratelimit(data["retry-after"])
+                    routes["*"].sync_from_ratelimit(data["retry-after"])
+
+                # NOTE: This is a bit of a whack way to deal with this.
+                # There should definitely be only one way to handle a ratelimit
+                # however not every user wants to handle an exception.
+                # We'll keep this for now, however it will definitely change when top.gg releases v[1|2] of their
+                # API.
                 if fail_if_timeout:
                     raise Ratelimited(data["retry-after"])
                 else:
+                    logger.debug("Instructed to continue if ratelimited. Waiting and retrying...")
                     await asyncio.sleep(data.get("retry-after", 3600))
                     return await self._request(method, uri, **kwargs)
             if response.status == 404:
@@ -144,6 +176,7 @@ class TopGG:
         """
         response = await self._request("GET", "/bots/" + str(bot_id), fail_if_timeout=fail_if_ratelimited)
         response["state"] = self.bot
+        logger.debug(f"Response from fetch_bot: {response}")
         return Bot(**response)
 
     async def fetch_bots(
@@ -169,6 +202,7 @@ class TopGG:
         if offset:
             uri += "&offset=" + str(offset)
         result = await self._request("GET", "/bots", fail_if_timeout=fail_if_ratelimited)
+        logger.debug(f"Response from fetching bots: {result}")
         new_results = []
         for bot in result["results"]:
             bot["state"] = self.bot
@@ -201,6 +235,7 @@ class TopGG:
             await self.bot.wait_until_ready()
         raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes", fail_if_timeout=fail_if_ratelimited)
         resolved = list(map(lambda u: SimpleUser(**u), raw_users))
+        logger.debug(f"Response from fetching votes: {resolved}")
         return resolved
 
     async def upvote_check(self, user_id: int, *, fail_if_ratelimited: bool = True) -> bool:
@@ -209,6 +244,8 @@ class TopGG:
             await self.bot.wait_until_ready()
         uri = f"/bots/{self.bot.user.id}/check?userId={user_id}"
         raw_users = await self._request("GET", uri, fail_if_timeout=fail_if_ratelimited)
+        logger.debug(f"Response from fetching upvote check: {raw_users}")
+        # Ah yes, three pieces of recycled code. How cool.
         return raw_users["voted"] == 1
 
     async def get_stats(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> BotStats:
@@ -217,6 +254,7 @@ class TopGG:
         NOTE: this does NOT fetch votes. Use the fetch_bot function for that."""
         uri = f"/bots/{bot_id}/stats"
         raw_stats = await self._request("GET", uri, fail_if_timeout=fail_if_ratelimited)
+        logger.debug(f"Response from fetching stats: {raw_stats}")
         return BotStats(**raw_stats)
 
     async def post_stats(self, stats: dict = None, *, fail_if_ratelimited: bool = True) -> int:
@@ -240,9 +278,11 @@ class TopGG:
                 stats["shards"] = shards
                 stats["shard_count"] = self.bot.shard_count
 
-        await self._request(
+        response = await self._request(
             "POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats), fail_if_timeout=fail_if_ratelimited
         )
+        logger.debug(f"Response from fetching posting stats: {response}")
+        self.bot.dispatch("guild_post", stats)
         return stats["server_count"]
 
     async def is_weekend(self) -> bool:

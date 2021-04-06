@@ -19,6 +19,11 @@ class Ratelimit:
             return 0.0
         return max((self.expires - datetime.utcnow()).total_seconds(), 0.0)
 
+    def sync_from_ratelimit(self, retry_after: float):
+        self.hits = self.max_hits
+        self.cooldown = retry_after
+        self.expires = datetime.utcnow() + timedelta(seconds=retry_after)
+
     def add_hit(self):
         self.hits += 1
         if self.expires is None or self.expires <= datetime.utcnow():
