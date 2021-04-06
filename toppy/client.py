@@ -88,6 +88,20 @@ class TopGG:
         logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
 
+    @property
+    def vote_url(self) -> str:
+        """Just gives you a link to your bot's vote page."""
+        if not self.bot.is_ready():
+            raise TypeError("Bot is not ready, can't produce a vote URL.")
+        return f"https://top.gg/bot/{self.bot.user.id}/vote"
+
+    @property
+    def invite_url(self) -> str:
+        """Just gives you a link to your bot's invite page."""
+        if not self.bot.is_ready():
+            raise TypeError("Bot is not ready, can't produce an invite URL.")
+        return f"https://top.gg/bot/{self.bot.user.id}/invite"
+
     async def _wf_s(self):
         if not self.session:
             logger.warning("self does not contain an aiohttp session. Forcing session setter task to run now.")
