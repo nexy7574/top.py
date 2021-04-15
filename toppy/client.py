@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 class TopGG:
-    """
+    r"""
     The client class for the top.gg API.
 
     This class handles everything for the top.gg API, APART FROM voting webhooks - Those are handled by the server
@@ -35,13 +35,19 @@ class TopGG:
     def __init__(
         self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True, ignore_local_ratelimit: bool = False
     ):
-        """
+        r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
 
-        :param bot: The "bot" instance to use. Can be one of (AutoSharded)[Bot|Client]. Bot is preferred.
-        :param token: Your top.gg API token.
-        :param autopost: Boolean indicating if to automatically publish stats every 30 minutes or not.
-        :param ignore_local_ratelimit: Boolean telling the class if it should ignore experimental localised ratelimiting
+        Parameters
+        ----------
+        bot:
+            The bot instance to use. Can be client or bot, and their auto-sharded equivalents.
+        token: :class:`str`
+            Your bot's API token from top.gg.
+        autopost: :class:`bool`
+            Whether to automatically post server count every 30 minutes or not.
+        ignore_local_ratelimit: :class:`bool`
+            If true, this will ignore experimental on-site ratelimiting, which is an internalised way of preventing 429s
         """
         self.bot = bot
         self.token = token
@@ -84,20 +90,20 @@ class TopGG:
         )
 
     def __del__(self):
-        """Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
+        r"""Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
         logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
 
     @property
     def vote_url(self) -> str:
-        """Just gives you a link to your bot's vote page."""
+        r"""Just gives you a link to your bot's vote page."""
         if not self.bot.is_ready():
             raise TypeError("Bot is not ready, can't produce a vote URL.")
         return f"https://top.gg/bot/{self.bot.user.id}/vote"
 
     @property
     def invite_url(self) -> str:
-        """Just gives you a link to your bot's invite page."""
+        r"""Just gives you a link to your bot's invite page."""
         if not self.bot.is_ready():
             raise TypeError("Bot is not ready, can't produce an invite URL.")
         return f"https://top.gg/bot/{self.bot.user.id}/invite"
@@ -110,7 +116,7 @@ class TopGG:
 
     @loop(minutes=30)
     async def autopost(self):
-        """The task that automatically posts our stats to top.gg"""
+        r"""The task that automatically posts our stats to top.gg."""
         result = await self.post_stats()
         self.bot.dispatch("toppy_stat_autopost", result)
 
@@ -181,12 +187,12 @@ class TopGG:
         return data
 
     async def fetch_bot(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> Bot:
-        """
+        r"""
         Fetches a bot from top.gg
 
         :param bot_id: The bot's client ID
         :param fail_if_ratelimited: Whether to raise an error if we get ratelimited or just wait an hour
-        :return: A bot model
+        :return: A :class:`toppy.models.Bot` model
         """
         response = await self._request("GET", "/bots/" + str(bot_id), fail_if_timeout=fail_if_ratelimited)
         response["state"] = self.bot
@@ -196,7 +202,7 @@ class TopGG:
     async def fetch_bots(
         self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None, fail_if_ratelimited: bool = True
     ) -> BotSearchResults:
-        """
+        r"""
         Fetches up to :limit: bots from top.gg
 
         :param limit: How many bots to fetch.
@@ -224,7 +230,7 @@ class TopGG:
         return BotSearchResults(*new_results, limit=limit, offset=offset)
 
     async def bulk_fetch_bots(self, limit: int = 500, *args) -> dict:
-        """Similar to fetch_bots, except allows for requesting more than 500.
+        r"""Similar to fetch_bots, except allows for requesting more than 500.
 
         This is equivalent to:
         ```python
@@ -244,7 +250,7 @@ class TopGG:
         return results
 
     async def fetch_votes(self, *, fail_if_ratelimited: bool = True) -> List[SimpleUser]:
-        """Fetches the last 1000 voters for your bot."""
+        r"""Fetches the last 1000 voters for your bot."""
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes", fail_if_timeout=fail_if_ratelimited)
@@ -253,7 +259,7 @@ class TopGG:
         return resolved
 
     async def upvote_check(self, user_id: int, *, fail_if_ratelimited: bool = True) -> bool:
-        """Checks to see if the provided user has voted for your bot in the pas 12 hours."""
+        r"""Checks to see if the provided user has voted for your bot in the pas 12 hours."""
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         uri = f"/bots/{self.bot.user.id}/check?userId={user_id}"
@@ -263,7 +269,7 @@ class TopGG:
         return raw_users["voted"] == 1
 
     async def get_stats(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> BotStats:
-        """Fetches the server & shard count for a bot.
+        r"""Fetches the server & shard count for a bot.
 
         NOTE: this does NOT fetch votes. Use the fetch_bot function for that."""
         uri = f"/bots/{bot_id}/stats"
@@ -272,7 +278,7 @@ class TopGG:
         return BotStats(**raw_stats)
 
     async def post_stats(self, stats: dict = None, *, fail_if_ratelimited: bool = True) -> int:
-        """
+        r"""
         Posts your bot's current statistics to top.gg
 
         :param stats: Use these stats instead of auto-generated ones. Not recommended.
@@ -300,13 +306,13 @@ class TopGG:
         return stats["server_count"]
 
     async def is_weekend(self) -> bool:
-        """Returns True or False, depending on if it's a "weekend".
+        r"""Returns True or False, depending on if it's a "weekend".
 
         If it's a weekend, votes count as double."""
         data = await self._request("GET", f"/weekend")
         return data["is_weekend"]
 
     async def fetch_user(self, user: Union[discord.User, discord.Object]) -> User:
-        """Fetches a user's profile from top.gg."""
+        r"""Fetches a user's profile from top.gg."""
         data = await self._request("GET", f"/users/{user.id}")
         return User(**data, state=self.bot)

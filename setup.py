@@ -3,13 +3,13 @@ from re import compile
 
 version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)\"")
 
-with open("requirements.txt") as requirements:
+with open("./requirements.txt") as requirements:
     reqs = requirements.read().splitlines()
 
-with open("README.md") as readme_file:
+with open("./README.md") as readme_file:
     readme = readme_file.read()
 
-with open("toppy/client.py") as client:
+with open("./toppy/client.py") as client:
     ct = client.read()
     version = version_regex.search(ct).group("v")
 
@@ -26,11 +26,15 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=reqs,
+    extras_require={
+        "tests": ["pytest", "flask", "requests"],
+    },
     python_requires=">=3.6",
     classifiers=[
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Operating System :: OS Independent",
+        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -39,5 +43,6 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
+        "Development Status :: 5 - Production/Stable"
     ],
 )
