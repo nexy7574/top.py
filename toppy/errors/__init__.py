@@ -9,11 +9,13 @@ class Forbidden(ToppyError):
 class Ratelimited(ToppyError):
     """Raised whenever the client is ratelimited for a long time and refused to handle it."""
 
-    def __init__(self, retry_after: float = 0.0):
+    def __init__(self, retry_after: float = 0.0, *, internal: bool = False):
+        self.internal = internal
         self.retry_after = retry_after
 
     def __str__(self):
-        return "Ratelimited by the top.gg API - Retry after " + str(self.retry_after) + "s"
+        who = "internal ratelimiter" if self.internal else "top.gg API"
+        return f"Ratelimited by the {who} - Retry after " + str(self.retry_after) + "s"
 
 
 class NotFound(ToppyError):

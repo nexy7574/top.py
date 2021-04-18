@@ -126,11 +126,11 @@ class TopGG:
                 rlc = routes["/bots/*"]
                 if rlc.ratelimited:
                     logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
-                    raise Ratelimited(rlc.retry_after)
+                    raise Ratelimited(rlc.retry_after, internal=True)
             if routes["*"].ratelimited:
                 logger.warning(f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
                                f" Perhaps review how many requests you're sending?")
-                raise Ratelimited(routes["*"].retry_after)
+                raise Ratelimited(routes["*"].retry_after, internal=True)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
             kwargs["data"] = dumps(kwargs["data"])
@@ -313,6 +313,20 @@ class TopGG:
         return data["is_weekend"]
 
     async def fetch_user(self, user: Union[discord.User, discord.Object]) -> User:
-        r"""Fetches a user's profile from top.gg."""
+        r"""
+        Fetches a user's profile from top.gg.
+
+        Parameters
+        ~~~~~~~~~~
+        user: Union[discord.User, discord.Member]
+            Who's top.gg profile to fetch.
+
+        Raises
+        ~~~~~~
+        toppy.errors.Forbidden:
+            Your API token was invalid.
+        toppy.errors.NotFound:
+            The user who you requested does not have a top.gg profile.
+        """
         data = await self._request("GET", f"/users/{user.id}")
         return User(**data, state=self.bot)
