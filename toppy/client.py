@@ -316,16 +316,12 @@ class TopGG:
         r"""
         Fetches a user's profile from top.gg.
 
-        Parameters
-        ~~~~~~~~~~
-        user: Union[discord.User, discord.Member]
+        :param user: Union[discord.User, discord.Member]
             Who's top.gg profile to fetch.
 
-        Raises
-        ~~~~~~
-        toppy.errors.Forbidden:
+        :raises toppy.errors.Forbidden:
             Your API token was invalid.
-        toppy.errors.NotFound:
+        :raises toppy.errors.NotFound:
             The user who you requested does not have a top.gg profile.
         """
         data = await self._request("GET", f"/users/{user.id}")
