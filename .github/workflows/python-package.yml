@@ -26,8 +26,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip pycodestyle
+        python -m pip install --upgrade wheel pip pycodestyle
         pip install -Ur requirements.txt
     - name: Lint with pycodestyle
       run: |
-        pycodestyle . --max-line-length=120 --count
+        pycodestyle ./toppy --max-line-length=120 --count
