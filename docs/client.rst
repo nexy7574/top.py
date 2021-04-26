@@ -11,8 +11,7 @@ This page will describe top.py's client class and it's attributes.
 
 Version
 ~~~~~~~
-.. py:data::
-    You can get a version from client.__version__
+You can get a version from toppy.client.Client.__version__
 
 Client
 ~~~~~~

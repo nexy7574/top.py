@@ -15,35 +15,23 @@ A modern python module wrapper for the official [top.gg API](https://docs.top.gg
 
 ## Installation
 ### Dev
-*without pip*
-```shell
-git clone https://github.com/dragdev-studios/top.py
-cd top.py
-python3 setup.py build && python3 setup.py install
-```
-*with pip*
 ```shell
 pip install git+https://github.com/dragdev-studios/top.py
 ```
-
 ### Stable
-pip
 ```shell
 pip install top.py
 ```
 
-git
+## Usage
+If you want docs, build them yourself.
 ```shell
-# replace curl with wget, or whatever you use to make web requests
-curl https://github.com/dragdev-studios/top.py/archive/<version>.tar.gz > top.py.tar.gz
-tar -xf top.py.tar.gz
-cd top.py
-python3 setup.py install
+$ cd docs
+$ make html
+$ npx http-server _build/html
 ```
 
-## Usage
-*Full documentation can be found by running `{python} -m pydoc toppy -b`, replacing `{python}` with whatever command you use to run python.*
-
+### Basic example (cog):
 ```python
 from toppy.client import TopGG
 from discord.ext import commands

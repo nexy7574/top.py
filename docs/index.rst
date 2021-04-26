@@ -14,6 +14,7 @@ toppy version:
    client.rst
    errors.rst
    ratelimiter.rst
+   models.rst
 
 
 

@@ -121,6 +121,14 @@ class TopGG:
         self.bot.dispatch("toppy_stat_autopost", result)
 
     async def _request(self, method: str, uri: str, **kwargs) -> dict:
+        # Hello fellow code explorer!
+        # Yes, this is the function that single-handedly carries this module
+        # Yes, it's a bit jank
+        # Yes, you're welcome to tidy it up
+        # No, there's no need to change anything
+        # It works perfectly fine
+        # JUST DON'T *TRY* TO BREAK IT
+        # Many thanks, eek
         if not self.ignore_local_ratelimit:
             if "/bots/" in uri:
                 rlc = routes["/bots/*"]
@@ -313,16 +321,13 @@ class TopGG:
         return data["is_weekend"]
 
     async def fetch_user(self, user: Union[discord.User, discord.Object]) -> User:
-        r"""
+        """
         Fetches a user's profile from top.gg.
 
-        :param user: Union[discord.User, discord.Member]
-            Who's top.gg profile to fetch.
-
-        :raises toppy.errors.Forbidden:
-            Your API token was invalid.
-        :raises toppy.errors.NotFound:
-            The user who you requested does not have a top.gg profile.
+        :param user: Union[discord.User, discord.Member] - Who's top.gg profile to fetch.
+        :raises toppy.errors.Forbidden: - Your API token was invalid.
+        :raises toppy.errors.NotFound: - The user who you requested does not have a top.gg profile.
+        :returns toppy.models.User: The fetched user's profile
         """
         data = await self._request("GET", f"/users/{user.id}")
         return User(**data, state=self.bot)

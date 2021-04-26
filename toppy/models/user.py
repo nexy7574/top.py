@@ -9,7 +9,9 @@ from discord.utils import oauth_url as invite
 
 
 class _ReprMixin(object):
+    """Mixin that provides every model with a humanized repr() string."""
     def __repr__(self):
+        """Humanized automatic repr string generator."""
         x = self.__class__.__name__ + "("
         args = []
         for attr_name, attr_value in self.__dict__.items():
@@ -25,15 +27,12 @@ class _ReprMixin(object):
         return x
 
 
-def calculate_avatar_url(user_id: int, discriminator: int, avatar_hash: str, *, default=...) -> str:
-    if not avatar_hash:
-        if default is ...:
-            return f"https://cdn.discordapp.com/embed/avatars/{discriminator % 5}.png"
-        return default
-    fmt = "png"
-    if avatar_hash.startswith("a_"):
-        fmt = "gif"
-    return f"https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.{fmt}"
+def default_avatar_url(discrim: int):
+    return f"https://cdn.discordapp.com/embed/avatars/{discrim % 5}.png"
+
+
+def calculate_avatar_url(user_id: int, _hash: str):
+    return f"https://cdn.discordapp.com/avatars/{user_id}/{_hash}.webp"
 
 
 class WeakAttr(dict, _ReprMixin):
@@ -47,6 +46,7 @@ class WeakAttr(dict, _ReprMixin):
 
 
 class UserABC(_ReprMixin):
+    """ABC that kinda conforms to discord.py's user class."""
     id: int
     username: str
     discriminator: str
@@ -81,30 +81,74 @@ class User(UserABC, _ReprMixin):
     """
 
     def __init__(self, **kwargs):
-        self.id: int = int(kwargs.pop("id"))
-        self.username: str = kwargs.pop("username")
-        self.discriminator: str = kwargs.pop("discriminator")
-        self.user_avatar: Optional[str] = calculate_avatar_url(
-            self.id, int(self.discriminator), kwargs.pop("avatar", None), default=None
-        )
-        self.default_avatar: str = calculate_avatar_url(self.id, int(self.discriminator), kwargs.pop("defAvatar"))
-        self.avatar: str = self.user_avatar or self.default_avatar
-        self.bio: Optional[str] = kwargs.pop("bio", None)
-        self.banner_url: Optional[str] = kwargs.pop("banner", None)
-        self.socials: WeakAttr = WeakAttr(kwargs.pop("social", {}))
+        self._id: int = int(kwargs.pop("id"))
+        self._username: str = kwargs.pop("username")
+        self._discriminator: str = kwargs.pop("discriminator")
+        self._default_avatar: str = default_avatar_url(int(self._discriminator))
+        self._avatar: str = kwargs.pop("avatar", None)
+        self._bio: Optional[str] = kwargs.pop("bio", None)
+        self._banner_url: Optional[str] = kwargs.pop("banner", None)
+        self._socials: WeakAttr = WeakAttr(kwargs.pop("social", {}))
         self._raw_colour = (kwargs.get("color", "0") or "0").lstrip("#")  # can be empty, for some reason.
-        self.colour: Colour = Colour(int(self._raw_colour, base=16))
-        self.color: Colour = self.colour
-        self.supporter: bool = kwargs.pop("supporter", False)  # NOTE: unable to get a response from top.gg what this
+        self._colour: Colour = Colour(int(self._raw_colour, base=16))
+        self._supporter: bool = kwargs.pop("supporter", False)  # NOTE: unable to get a response from top.gg what this
         # actually is. It isn't premium.
-        self.site_mod: bool = kwargs.pop("mod") or kwargs.pop("webMod")  # these are the same thing as far as I'm aware
-        self.site_admin: bool = kwargs.pop("admin", False)
-        self.certified: bool = kwargs.pop("certified", False)  # if the user has a certified bot
+        self._site_mod: bool = kwargs.pop("mod") or kwargs.pop("webMod")  # these are the same thing as far as I'm aware
+        self._site_admin: bool = kwargs.pop("admin", False)
+        self._certified: bool = kwargs.pop("certified", False)  # if the user has a certified bot
 
         if kwargs.get("state"):
             self._user: Optional[DiscordUser] = kwargs["state"].get_user(self.id)
         else:
             self._user: Optional[DiscordUser] = None
+
+    @property
+    def id(self) -> int:
+        """The user's user ID."""
+        return self._id
+
+    @property
+    def name(self) -> str:
+        """The user's username."""
+        return self._username
+
+    @property
+    def discriminator(self) -> str:
+        """The user's #0000 discriminator"""
+        return self._discriminator
+    
+    @property
+    def avatar_url(self) -> str:
+        """This returns the user's resolved avatar URL.
+
+        If the user doesn't have an avatar, this will return their default one."""
+        if self._avatar:
+            return calculate_avatar_url(self.id, self._avatar)
+        return default_avatar_url(int(self.discriminator))
+
+    @property
+    def bio(self) -> str:
+        """The user's bio section on top.gg"""
+        return self._bio
+
+    @property
+    def banner_url(self) -> str:
+        """The user's banner URL on their top.gg profile"""
+        return self._banner_url
+
+    @property
+    def colour(self) -> Colour:
+        """The user's preferred navigation colour.
+
+        There is an alias for this under toppy.models.User.color
+
+        :returns: discord.Colour - the resolved colour"""
+        return self._colour
+
+    @property
+    def color(self) -> Colour:
+        """Alias for toppy.models.User.colour"""
+        return self.colour
 
     def user(self, state=None) -> Optional[DiscordUser]:
         """Gets the current discord user object from the top.gg user object.
@@ -171,9 +215,7 @@ class Bot(UserABC, _ReprMixin):
 
 
 class BotSearchResults(_ReprMixin):
-    """A class returned solely by TopGG.[bulk_]fetch_bots.
-
-    Iterating will iterate through the bot results."""
+    """A"""
     # We love linting.
     results: Tuple[Bot]
     limit: int
@@ -189,7 +231,7 @@ class BotSearchResults(_ReprMixin):
         self.total = self.count
 
     def __getitem__(self, item):
-        raise DeprecationWarning("[bulk_]fetch_bots no-longer returns a dictionary, and it looks like you treat it "
+        raise DeprecationWarning("fetch_bots no-longer returns a dictionary, and it looks like you treat it "
                                  "as such. You should now use iter(results) (to iterate results) or use one of "
                                  "the attributes.")
 

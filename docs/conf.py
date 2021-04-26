@@ -11,31 +11,37 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import re
+import sys
+
 sys.path.insert(0, os.path.abspath('..'))
 
+with open("../toppy/client.py") as client:
+    version_regex = re.compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)\"")
+    ct = client.read()
+    __version__ = version_regex.search(ct).group("v")
 
 # -- Project information -----------------------------------------------------
 
 project = 'top.py'
 copyright = '2021, DragDev Studios'
 author = 'DragDev Studios'
-version_regex = re.compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)\"")
-
-with open("../requirements.txt") as requirements:
-    reqs = requirements.read().splitlines()
-
+version = __version__
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.autosummary", "sphinx.ext.duration"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.duration", "sphinx.ext.intersphinx"]
+
+intersphinx_mapping = {
+    "discord": (f"https://discordpy.readthedocs.io/en/stable", None)
+}
+
 source_suffix = {
     ".rst": "restructuredtext",
-    ".md": "markdown"
+    ".md": "markdown",
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -45,7 +51,6 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 
 # -- Options for HTML output -------------------------------------------------
 
