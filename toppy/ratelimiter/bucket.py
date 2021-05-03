@@ -10,6 +10,7 @@ class Ratelimit:
     :param hits: int - The maximum number of times the API can be hit before a 429 is expected.
     :param cooldown: float - The cooldown time when hitting a 429. For top.gg, this is always 3600.0 (1 hour)
     """
+
     def __init__(self, *, route: str, hits: int, cooldown: float):
         self.route = route
         self.max_hits = hits

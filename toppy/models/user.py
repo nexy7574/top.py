@@ -10,6 +10,7 @@ from discord.utils import oauth_url as invite
 
 class _ReprMixin(object):
     """Mixin that provides every model with a humanized repr() string."""
+
     def __repr__(self):
         """Humanized automatic repr string generator."""
         x = self.__class__.__name__ + "("
@@ -47,6 +48,7 @@ class WeakAttr(dict, _ReprMixin):
 
 class UserABC(_ReprMixin):
     """ABC that kinda conforms to discord.py's user class."""
+
     id: int
     username: str
     discriminator: str
@@ -116,7 +118,7 @@ class User(UserABC, _ReprMixin):
     def discriminator(self) -> str:
         """The user's #0000 discriminator"""
         return self._discriminator
-    
+
     @property
     def avatar_url(self) -> str:
         """This returns the user's resolved avatar URL.
@@ -216,6 +218,7 @@ class Bot(UserABC, _ReprMixin):
 
 class BotSearchResults(_ReprMixin):
     """A"""
+
     # We love linting.
     results: Tuple[Bot]
     limit: int
@@ -231,9 +234,11 @@ class BotSearchResults(_ReprMixin):
         self.total = self.count
 
     def __getitem__(self, item):
-        raise DeprecationWarning("fetch_bots no-longer returns a dictionary, and it looks like you treat it "
-                                 "as such. You should now use iter(results) (to iterate results) or use one of "
-                                 "the attributes.")
+        raise DeprecationWarning(
+            "fetch_bots no-longer returns a dictionary, and it looks like you treat it "
+            "as such. You should now use iter(results) (to iterate results) or use one of "
+            "the attributes."
+        )
 
     def __iter__(self):
         return self.results

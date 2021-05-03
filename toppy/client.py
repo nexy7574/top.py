@@ -136,8 +136,10 @@ class TopGG:
                     logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
                     raise Ratelimited(rlc.retry_after, internal=True)
             if routes["*"].ratelimited:
-                logger.warning(f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
-                               f" Perhaps review how many requests you're sending?")
+                logger.warning(
+                    f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
+                    f" Perhaps review how many requests you're sending?"
+                )
                 raise Ratelimited(routes["*"].retry_after, internal=True)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
@@ -148,7 +150,7 @@ class TopGG:
         url = _base_ + uri
         await self._wf_s()
 
-        logger.info("Sending \"{} {}\"...".format(method, url))
+        logger.info('Sending "{} {}"...'.format(method, url))
         async with self.session.request(method, url, **kwargs) as response:
             if response.status in range(500, 600):
                 raise TopGGServerError()

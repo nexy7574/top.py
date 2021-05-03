@@ -11,7 +11,7 @@ parser.add_argument("-V", "--version", help="Display version information", actio
 args = parser.parse_args()
 
 if args.version:
-    print("-"*15)
+    print("-" * 15)
     print(f"Python Version: {'.'.join(map(str, sys.version_info[:3]))}")
     print(f"Platform: {sys.platform}", end="")
     print(f" ({platform.platform()}, {platform.version()})")
@@ -21,11 +21,12 @@ if args.version:
     print(f"top.py version: {version} (installed: ", end="")
 
     created_at = datetime.datetime.utcfromtimestamp(os.path.getmtime("./client.py"))
-    print(created_at.strftime("%c")+")")
+    print(created_at.strftime("%c") + ")")
     print("discord.py version: ", end="")
     try:
         import discord
-        print('.'.join(map(str, discord.version_info[:3])))
+
+        print(".".join(map(str, discord.version_info[:3])))
     except ImportError:
         print("Not Installed")
-    print("-"*15)
+    print("-" * 15)
