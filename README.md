@@ -24,12 +24,7 @@ pip install top.py
 ```
 
 ## Usage
-If you want docs, build them yourself.
-```shell
-$ cd docs
-$ make html
-$ npx http-server _build/html
-```
+We now have docs at [toppy.dragdev.xyz!](//toppy.dragdev.xyz) These docs are built weekly from the master branch.
 
 ### Basic example (cog):
 ```python
