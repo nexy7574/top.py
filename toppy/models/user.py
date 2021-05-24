@@ -13,6 +13,9 @@ class _ReprMixin(object):
 
     def __repr__(self):
         """Humanized automatic repr string generator."""
+        # According to peers this repr method is bad
+        # (ref: https://discord.com/channels/264445053596991498/272764566411149314/820678536079212615)
+        # So maybe we can tidy it up at some point?
         x = self.__class__.__name__ + "("
         args = []
         for attr_name, attr_value in self.__dict__.items():
@@ -28,6 +31,7 @@ class _ReprMixin(object):
         return x
 
 
+# The following two methods are a bit pointless, they're only used a couple times.
 def default_avatar_url(discrim: int):
     return f"https://cdn.discordapp.com/embed/avatars/{discrim % 5}.png"
 
@@ -75,6 +79,18 @@ class SimpleUser(_ReprMixin):
         )
 
 
+class Socials(_ReprMixin):
+    """Model containing every social link on a top.gg user's profile."""
+    def __init__(self, **kwargs):
+        # NOTE:
+        # We don't resolve URLs here. We're gonna leave that up to the user.
+        self.youtube = kwargs.pop("youtube", None)
+        self.reddit = kwargs.pop("reddit", None)
+        self.instagram = kwargs.pop("instagram", None)
+        self.github = kwargs.pop("github", None)
+        self.twitter = kwargs.pop("twitter", None)
+
+
 class User(UserABC, _ReprMixin):
     """
     Model representing a top.gg user's account.
@@ -90,7 +106,7 @@ class User(UserABC, _ReprMixin):
         self._avatar: str = kwargs.pop("avatar", None)
         self._bio: Optional[str] = kwargs.pop("bio", None)
         self._banner_url: Optional[str] = kwargs.pop("banner", None)
-        self._socials: WeakAttr = WeakAttr(kwargs.pop("social", {}))
+        self._socials = kwargs.pop("social", {})
         self._raw_colour = (kwargs.get("color", "0") or "0").lstrip("#")  # can be empty, for some reason.
         self._colour: Colour = Colour(int(self._raw_colour, base=16))
         self._supporter: bool = kwargs.pop("supporter", False)  # NOTE: unable to get a response from top.gg what this
@@ -103,6 +119,11 @@ class User(UserABC, _ReprMixin):
             self._user: Optional[DiscordUser] = kwargs["state"].get_user(self.id)
         else:
             self._user: Optional[DiscordUser] = None
+    
+    @property
+    def socials(self) -> Socials:
+        """An object containing the user's social links."""
+        return Socials(**self._socials)
 
     @property
     def id(self) -> int:
@@ -217,7 +238,7 @@ class Bot(UserABC, _ReprMixin):
 
 
 class BotSearchResults(_ReprMixin):
-    """A"""
+    """A container for search results."""
 
     # We love linting.
     results: Tuple[Bot]

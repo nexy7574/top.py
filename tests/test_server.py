@@ -1,4 +1,6 @@
 import asyncio
+from aiohttp.web import Response
+import pytest
 
 from toppy.server import _create_callback, Vote
 
@@ -23,9 +25,12 @@ class Sponge:
 
 class FakeRequest:
     headers = {"Authorization": "foobar"}
+    remote = "127.0.0.1"
+    def __init__(self, new_data = POST_DATA):
+        self.data = new_data
 
     async def json(self):
-        return POST_DATA
+        return self.data
 
 
 def test_vote_server():
@@ -33,7 +38,8 @@ def test_vote_server():
     loop = asyncio.get_event_loop()
 
     cb = _create_callback(sponge, "foobar")
-    loop.run_until_complete(cb(FakeRequest()))
+    response = loop.run_until_complete(cb(FakeRequest()))
+    assert response.status == 200
 
 
 def test_vote_server_broken_creds():
@@ -41,7 +47,8 @@ def test_vote_server_broken_creds():
     loop = asyncio.get_event_loop()
 
     cb = _create_callback(sponge, "foobarbazz")
-    loop.run_until_complete(cb(FakeRequest()))
+    response: Response = loop.run_until_complete(cb(FakeRequest()))
+    assert response.status == 401
 
 
 def test_vote_server_broken_data():
@@ -49,5 +56,9 @@ def test_vote_server_broken_data():
     sponge = Sponge()
     loop = asyncio.get_event_loop()
 
-    cb = _create_callback(sponge, "foobarbazz")
-    loop.run_until_complete(cb(FakeRequest()))
+    cb = _create_callback(sponge, "foobar")
+    _data = POST_DATA.copy()
+    for key in _data.keys():
+        _data[key] = None
+    response: Response = loop.run_until_complete(cb(FakeRequest(_data)))
+    assert response.status == 422
