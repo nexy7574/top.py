@@ -9,13 +9,20 @@
 
 An alternative wrapper for the [top.gg API](//docs.top.gg)
 
-**THIS MODULE IS NOT ENDORSED BY TOP.GG.** Their official package is [here](https://pypi.org/project/dblpy).
+*Please note, this is __not an official package from top.gg__. We are not affiliated with top.gg in any way.
+If you want to install their official package, please see [their repo](//github.com/top-gg/python-sdk).*
 
 
 ## Installation
+You can install the latest stable release here:
 ```shell
 pip install top.py
 ```
+But, if you're reading this, you're most likely a developer - you should know how to install packages by now.
+
+## Getting support
+Please feel free to mention me (`@eek#7574`/`<@421698654189912064>`) in the top.gg server, 
+or join the dragdev studios server [here](//discord.gg/YBNWw7nMGH)
 
 ## Usage
 We now have docs at [toppy.dragdev.xyz!](//toppy.dragdev.xyz) These docs are built weekly from the master branch.
