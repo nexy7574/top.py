@@ -1,7 +1,7 @@
 from setuptools import setup
 from re import compile
 
-version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)\"")
+version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
 
 with open("./requirements.txt") as requirements:
     reqs = requirements.read().splitlines()
