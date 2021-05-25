@@ -19,11 +19,13 @@ def _create_callback(bot, auth, *, disable_warnings: bool = False):
             return web.Response(body='{"detail": "malformed body."}', status=422)
         bot.dispatch("vote", vote)
         return web.Response(body='{"detail": "accepted"}')
+
     return callback
 
 
-async def create_server(bot, *, host: str = "0.0.0.0", port: int = 8080, path: str = "/", auth: str = None,
-                        disable_warnings: bool = False):
+async def create_server(
+    bot, *, host: str = "0.0.0.0", port: int = 8080, path: str = "/", auth: str = None, disable_warnings: bool = False
+):
     """
     Creates a vote webhook server.
     This will listen for webhooks on <host>:<port>[/<path>].

@@ -6,11 +6,11 @@ from toppy.server import _create_callback, Vote
 
 
 POST_DATA = {
-  "bot": "619328560141697036",
-  "user": "421698654189912064",
-  "type": "test",
-  "isWeekend": False,
-  "query": "?test=data&notRandomNumber=8"
+    "bot": "619328560141697036",
+    "user": "421698654189912064",
+    "type": "test",
+    "isWeekend": False,
+    "query": "?test=data&notRandomNumber=8",
 }
 
 
@@ -26,7 +26,8 @@ class Sponge:
 class FakeRequest:
     headers = {"Authorization": "foobar"}
     remote = "127.0.0.1"
-    def __init__(self, new_data = POST_DATA):
+
+    def __init__(self, new_data=POST_DATA):
         self.data = new_data
 
     async def json(self):

@@ -81,6 +81,7 @@ class SimpleUser(_ReprMixin):
 
 class Socials(_ReprMixin):
     """Model containing every social link on a top.gg user's profile."""
+
     def __init__(self, **kwargs):
         # NOTE:
         # We don't resolve URLs here. We're gonna leave that up to the user.
@@ -119,7 +120,7 @@ class User(UserABC, _ReprMixin):
             self._user: Optional[DiscordUser] = kwargs["state"].get_user(self.id)
         else:
             self._user: Optional[DiscordUser] = None
-    
+
     @property
     def socials(self) -> Socials:
         """An object containing the user's social links."""

@@ -56,5 +56,3 @@ bot = _FakeBot()
 class Request(dict):
     def __init__(self, endpoint: str, method: str = "GET", data: dict = None):
         super().__init__(endpoint=endpoint, method=method.upper(), data=data)
-
-

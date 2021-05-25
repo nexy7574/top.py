@@ -43,6 +43,6 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities",
-        "Development Status :: 5 - Production/Stable"
+        "Development Status :: 5 - Production/Stable",
     ],
 )
