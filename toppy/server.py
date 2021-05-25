@@ -22,7 +22,7 @@ def _create_callback(bot, auth, *, disable_warnings: bool = False):
     return callback
 
 
-async def create_server(bot, *, host: str = "127.0.0.1", port: int = 8080, path: str = "/", auth: str = None,
+async def create_server(bot, *, host: str = "0.0.0.0", port: int = 8080, path: str = "/", auth: str = None,
                         disable_warnings: bool = False):
     """
     Creates a vote webhook server.
