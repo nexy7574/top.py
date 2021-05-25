@@ -17,7 +17,7 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 with open("../toppy/client.py") as client:
-    version_regex = re.compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)\"")
+    version_regex = re.compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
     ct = client.read()
     __version__ = version_regex.search(ct).group("v")
 
