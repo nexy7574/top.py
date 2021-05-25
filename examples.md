@@ -75,3 +75,39 @@ async def stats_posted(data: dict):
 
 bot.run("token")
 ```
+
+## Webhook
+### Code:
+```python
+from toppy.models.webhooks import Vote
+from toppy.server import create_server
+from discord.ext import commands
+
+bot = commands.Bot("!")
+
+webhook_host = "0.0.0.0"
+webhook_port = 2048  # set to whatever port you've forwarded
+webhook_path = "/vote"  # http://host:port/[path] (this examples would be :port/vote)
+webhook_auth = "..."  # This is the authorisation sent by top.gg to verify that their request is real.
+                      # if you want to disable this (don't), you can set it to `None`.
+
+bot.top_gg_server = bot.loop.run_until_complete(  # we have to use run until complete as
+    create_server(  # this function right here is an async one.
+        bot,
+        host=webhook_host,
+        port=webhook_port,
+        path=webhook_path,
+        auth=webhook_auth
+    )
+)
+
+@bot.event
+async def on_vote(vote: Vote):
+    print(f"New vote from {vote.user.id}!")
+
+bot.run("token")
+```
+
+This will look like the below screenshot on top.gg:
+
+![well then, your image loaded well didn't it](https://cdn.discordapp.com/attachments/635528394033070090/846768933981126706/unknown.png)
