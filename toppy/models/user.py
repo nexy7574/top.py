@@ -110,12 +110,10 @@ class User(UserABC, _ReprMixin):
         self._socials = kwargs.pop("social", {})
         self._raw_colour = (kwargs.get("color", "0") or "0").lstrip("#")  # can be empty, for some reason.
         self._colour: Colour = Colour(int(self._raw_colour, base=16))
-        self._supporter: bool = kwargs.pop("supporter", False)  # NOTE: unable to get a response from top.gg what this
-        # actually is. It isn't premium.
+        self._supporter: bool = kwargs.pop("supporter", False)
         self._site_mod: bool = kwargs.pop("mod") or kwargs.pop("webMod")  # these are the same thing as far as I'm aware
         self._site_admin: bool = kwargs.pop("admin", False)
         self._certified: bool = kwargs.pop("certified", False)  # if the user has a certified bot
-
         if kwargs.get("state"):
             self._user: Optional[DiscordUser] = kwargs["state"].get_user(self.id)
         else:
