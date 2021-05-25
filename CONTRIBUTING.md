@@ -8,3 +8,5 @@ This ensures a constant code style across all files, improving maintainability.
 # Opening a pull request
 
 Please make sure you've clearly described what you changed and why you changed it.
+
+Also, if CI fails (on any version), you will be required to fix any errors before (re-)requesting a review.
