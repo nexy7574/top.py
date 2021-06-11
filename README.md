@@ -43,7 +43,7 @@ It's entirely up to your personal preference. But here's a few differences betwe
 
 Just try it, you can choose what you like.
 
-Also, while we try to be our own package, you may notice we've aiased a few classes, functions and behavious
+Also, while we try to be our own package, you may notice we've aliased a few classes, functions and behavious
 to act like top.gg's sdk. This is mainly so you have an easier experience migrating, and it's less headache.
 
 
