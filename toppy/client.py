@@ -172,14 +172,14 @@ class TopGG:
                 data["_toppy_meta"] = {"headers": response.headers, "status": response.status}
         return data
 
-    async def fetch_bot(self, bot_id: int) -> Bot:
+    async def fetch_bot(self, bot: Union[discord.User, discord.Member, discord.Object]) -> Bot:
         r"""
         Fetches a bot from top.gg
 
-        :param bot_id: The bot's client ID
+        :param bot: The bot's user to fetch
         :return: A :class:`toppy.models.Bot` model
         """
-        response = await self._request("GET", "/bots/" + str(bot_id))
+        response = await self._request("GET", "/bots/" + str(bot.id))
         response["state"] = self.bot
         logger.debug(f"Response from fetch_bot: {response}")
         return Bot(**response)
@@ -233,7 +233,7 @@ class TopGG:
             results = {**results, **batch_results}
         return results
 
-    async def fetch_votes(self,) -> List[SimpleUser]:
+    async def fetch_votes(self) -> List[SimpleUser]:
         r"""Fetches the last 1000 voters for your bot."""
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
@@ -242,21 +242,21 @@ class TopGG:
         logger.debug(f"Response from fetching votes: {resolved}")
         return resolved
 
-    async def upvote_check(self, user_id: int) -> bool:
+    async def upvote_check(self, user: Union[discord.User, discord.Member, discord.Object]) -> bool:
         r"""Checks to see if the provided user has voted for your bot in the pas 12 hours."""
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
-        uri = f"/bots/{self.bot.user.id}/check?userId={user_id}"
+        uri = f"/bots/{self.bot.user.id}/check?userId={user.id}"
         raw_users = await self._request("GET", uri)
         logger.debug(f"Response from fetching upvote check: {raw_users}")
         # Ah yes, three pieces of recycled code. How cool.
         return raw_users["voted"] == 1
 
-    async def get_stats(self, bot_id: int) -> BotStats:
+    async def get_stats(self, bot: Union[discord.User, discord.Member, discord.Object]) -> BotStats:
         r"""Fetches the server & shard count for a bot.
 
         NOTE: this does NOT fetch votes. Use the fetch_bot function for that."""
-        uri = f"/bots/{bot_id}/stats"
+        uri = f"/bots/{bot.id}/stats"
         raw_stats = await self._request("GET", uri)
         logger.debug(f"Response from fetching stats: {raw_stats}")
         return BotStats(**raw_stats)
@@ -265,7 +265,6 @@ class TopGG:
         r"""
         Posts your bot's current statistics to top.gg
 
-        :param stats: Use these stats instead of auto-generated ones. Not recommended.
         :return: an integer of how many servers got posted.
         """
         if not self.bot.is_ready():
