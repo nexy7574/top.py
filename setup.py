@@ -3,13 +3,13 @@ from re import compile
 
 version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
 
-with open("./requirements.txt") as requirements:
+with open("./requirements.txt", encoding="utf-8") as requirements:
     reqs = requirements.read().splitlines()
 
-with open("./README.md") as readme_file:
+with open("./README.md", encoding="utf-8") as readme_file:
     readme = readme_file.read()
 
-with open("./toppy/client.py") as client:
+with open("./toppy/client.py", encoding="utf-8") as client:
     ct = client.read()
     version = version_regex.search(ct).group("v")
 
