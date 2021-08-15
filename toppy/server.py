@@ -1,5 +1,4 @@
 import logging
-from typing import Type
 from aiohttp import web
 from .models import Vote
 
