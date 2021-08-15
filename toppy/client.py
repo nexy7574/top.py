@@ -137,6 +137,11 @@ class TopGG:
             if response.status in range(500, 600):
                 raise TopGGServerError()
             else:
+                self.bot.dispatch(
+                    "toppy_request",
+                    url=url,
+                    method=method
+                )
                 # NOTE: This has moved from just before the return since the hits count as soon as a response
                 # is generated (unless it's 5xx).
                 if "/bots/" in uri:
