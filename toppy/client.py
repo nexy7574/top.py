@@ -128,7 +128,6 @@ class TopGG:
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
             kwargs["data"] = dumps(kwargs["data"])
 
-        fail_if_timeout = kwargs.pop("fail_if_timeout", True)
         expected_codes = kwargs.pop("expected_codes", [200])
         url = _base_ + uri
         await self._wf_s()
@@ -161,12 +160,7 @@ class TopGG:
                 # however not every user wants to handle an exception.
                 # We'll keep this for now, however it will definitely change when top.gg releases v[1|2] of their
                 # API.
-                if fail_if_timeout:
-                    raise Ratelimited(data["retry-after"])
-                else:
-                    logger.debug("Instructed to continue if ratelimited. Waiting and retrying...")
-                    await asyncio.sleep(data.get("retry-after", 3600))
-                    return await self._request(method, uri, **kwargs)
+                raise Ratelimited(data["retry-after"])
             if response.status == 404:
                 raise NotFound()
             if response.status not in expected_codes:
@@ -178,21 +172,20 @@ class TopGG:
                 data["_toppy_meta"] = {"headers": response.headers, "status": response.status}
         return data
 
-    async def fetch_bot(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> Bot:
+    async def fetch_bot(self, bot_id: int) -> Bot:
         r"""
         Fetches a bot from top.gg
 
         :param bot_id: The bot's client ID
-        :param fail_if_ratelimited: Whether to raise an error if we get ratelimited or just wait an hour
         :return: A :class:`toppy.models.Bot` model
         """
-        response = await self._request("GET", "/bots/" + str(bot_id), fail_if_timeout=fail_if_ratelimited)
+        response = await self._request("GET", "/bots/" + str(bot_id))
         response["state"] = self.bot
         logger.debug(f"Response from fetch_bot: {response}")
         return Bot(**response)
 
     async def fetch_bots(
-        self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None, fail_if_ratelimited: bool = True
+        self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None
     ) -> BotSearchResults:
         r"""
         Fetches up to :limit: bots from top.gg
@@ -201,7 +194,6 @@ class TopGG:
         :param offset: How many bots to "skip" (pagination)
         :param search: Search pairs (e.g. {"library": "discord.py"})
         :param sort: What field to sort by. Prefix with dash to reverse results.
-        :param fail_if_ratelimited: Deprecated.
         :return: A BotSearchResults object
         """
         limit = max(2, min(500, limit))
@@ -213,7 +205,7 @@ class TopGG:
             uri += "&sort=" + sort
         if offset:
             uri += "&offset=" + str(offset)
-        result = await self._request("GET", "/bots", fail_if_timeout=fail_if_ratelimited)
+        result = await self._request("GET", "/bots")
         logger.debug(f"Response from fetching bots: {result}")
         new_results = []
         for bot in result["results"]:
@@ -241,40 +233,39 @@ class TopGG:
             results = {**results, **batch_results}
         return results
 
-    async def fetch_votes(self, *, fail_if_ratelimited: bool = True) -> List[SimpleUser]:
+    async def fetch_votes(self,) -> List[SimpleUser]:
         r"""Fetches the last 1000 voters for your bot."""
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
-        raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes", fail_if_timeout=fail_if_ratelimited)
+        raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes")
         resolved = list(map(lambda u: SimpleUser(**u), raw_users))
         logger.debug(f"Response from fetching votes: {resolved}")
         return resolved
 
-    async def upvote_check(self, user_id: int, *, fail_if_ratelimited: bool = True) -> bool:
+    async def upvote_check(self, user_id: int) -> bool:
         r"""Checks to see if the provided user has voted for your bot in the pas 12 hours."""
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         uri = f"/bots/{self.bot.user.id}/check?userId={user_id}"
-        raw_users = await self._request("GET", uri, fail_if_timeout=fail_if_ratelimited)
+        raw_users = await self._request("GET", uri)
         logger.debug(f"Response from fetching upvote check: {raw_users}")
         # Ah yes, three pieces of recycled code. How cool.
         return raw_users["voted"] == 1
 
-    async def get_stats(self, bot_id: int, *, fail_if_ratelimited: bool = True) -> BotStats:
+    async def get_stats(self, bot_id: int) -> BotStats:
         r"""Fetches the server & shard count for a bot.
 
         NOTE: this does NOT fetch votes. Use the fetch_bot function for that."""
         uri = f"/bots/{bot_id}/stats"
-        raw_stats = await self._request("GET", uri, fail_if_timeout=fail_if_ratelimited)
+        raw_stats = await self._request("GET", uri)
         logger.debug(f"Response from fetching stats: {raw_stats}")
         return BotStats(**raw_stats)
 
-    async def post_stats(self, stats: dict = None, *, fail_if_ratelimited: bool = True) -> int:
+    async def post_stats(self, stats: dict = None) -> int:
         r"""
         Posts your bot's current statistics to top.gg
 
         :param stats: Use these stats instead of auto-generated ones. Not recommended.
-        :param fail_if_ratelimited: Whether to raise an error if ratelimited or wait an hour
         :return: an integer of how many servers got posted.
         """
         if not self.bot.is_ready():
@@ -291,7 +282,7 @@ class TopGG:
                 stats["shard_count"] = self.bot.shard_count
 
         response = await self._request(
-            "POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats), fail_if_timeout=fail_if_ratelimited
+            "POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats)
         )
         logger.debug(f"Response from fetching posting stats: {response}")
         self.bot.dispatch("guild_post", stats)
