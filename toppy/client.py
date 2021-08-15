@@ -261,7 +261,7 @@ class TopGG:
         logger.debug(f"Response from fetching stats: {raw_stats}")
         return BotStats(**raw_stats)
 
-    async def post_stats(self, stats: dict = None) -> int:
+    async def post_stats(self) -> int:
         r"""
         Posts your bot's current statistics to top.gg
 
@@ -270,16 +270,13 @@ class TopGG:
         """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
-        override = stats is not None
-        stats = stats or {}
-        if not override:
-            stats["server_count"] = len(self.bot.guilds)
-            if hasattr(self.bot, "shards") and self.bot.shards:
-                shards = []
-                for shard in self.bot.shards.values():
-                    shards.append(len([x for x in self.bot.guilds if x.shard_id == shard.id]))
-                stats["shards"] = shards
-                stats["shard_count"] = self.bot.shard_count
+        stats = {"server_count": len(self.bot.guilds)}
+        if hasattr(self.bot, "shards") and self.bot.shards:
+            shards = []
+            for shard in self.bot.shards.values():
+                shards.append(len([x for x in self.bot.guilds if x.shard_id == shard.id]))
+            stats["shards"] = shards
+            stats["shard_count"] = self.bot.shard_count
 
         response = await self._request(
             "POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats)
@@ -295,7 +292,7 @@ class TopGG:
         data = await self._request("GET", f"/weekend")
         return data["is_weekend"]
 
-    async def fetch_user(self, user: Union[discord.User, discord.Object]) -> User:
+    async def fetch_user(self, user: Union[discord.User, discord.Member, discord.Object]) -> User:
         """
         Fetches a user's profile from top.gg.
 
