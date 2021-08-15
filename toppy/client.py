@@ -18,7 +18,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
 
-__version__ = "1.1.3-beta.1"
+__version__ = "1.2.0"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
 logger = logging.getLogger(__name__)
