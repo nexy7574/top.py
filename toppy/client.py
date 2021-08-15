@@ -33,7 +33,7 @@ class TopGG:
     """
 
     def __init__(
-        self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True, ignore_local_ratelimit: bool = False
+        self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True
     ):
         r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
@@ -46,33 +46,11 @@ class TopGG:
             Your bot's API token from top.gg.
         autopost: :class:`bool`
             Whether to automatically post server count every 30 minutes or not.
-        ignore_local_ratelimit: :class:`bool`
-            If true, this will ignore experimental on-site ratelimiting, which is an internalised way of preventing 429s
         """
         self.bot = bot
         self.token = token
-        self.ignore_local_ratelimit = ignore_local_ratelimit
         # noinspection PyTypeChecker
         self.session = None  # type: aiohttp.ClientSession
-
-        async def set_session():
-            self.session = aiohttp.ClientSession(
-                headers={
-                    "User-Agent": f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
-                    "Authorization": self.token,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                }
-            )
-
-        # Why is this here?
-        # There's an undesirable warning if you make a session from outside an async function. Kinda crap but meh.
-        if not self.bot.loop.is_running():
-            logger.debug("Stealing idle loop to create aiohttp session.")
-            self.bot.loop.run_until_complete(set_session())
-        else:
-            logger.debug("Loop is in use - creating task to create aiohttp session.")
-            self._session_setter = self.bot.loop.create_task(set_session())
 
         if autopost:
             logger.debug("Starting autopost task.")
@@ -110,8 +88,14 @@ class TopGG:
 
     async def _wf_s(self):
         if not self.session:
-            logger.warning("self does not contain an aiohttp session. Forcing session setter task to run now.")
-            await self._session_setter
+            self.session = aiohttp.ClientSession(
+                headers={
+                    "User-Agent": f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
+                    "Authorization": self.token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                }
+            )
         return
 
     @loop(minutes=30)
@@ -129,18 +113,17 @@ class TopGG:
         # It works perfectly fine
         # JUST DON'T *TRY* TO BREAK IT
         # Many thanks, eek
-        if not self.ignore_local_ratelimit:
-            if "/bots/" in uri:
-                rlc = routes["/bots/*"]
-                if rlc.ratelimited:
-                    logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
-                    raise Ratelimited(rlc.retry_after, internal=True)
-            if routes["*"].ratelimited:
-                logger.warning(
-                    f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
-                    f" Perhaps review how many requests you're sending?"
-                )
-                raise Ratelimited(routes["*"].retry_after, internal=True)
+        if "/bots/" in uri:
+            rlc = routes["/bots/*"]
+            if rlc.ratelimited:
+                logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
+                raise Ratelimited(rlc.retry_after, internal=True)
+        if routes["*"].ratelimited:
+            logger.warning(
+                f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
+                f" Perhaps review how many requests you're sending?"
+            )
+            raise Ratelimited(routes["*"].retry_after, internal=True)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
             kwargs["data"] = dumps(kwargs["data"])
@@ -167,12 +150,11 @@ class TopGG:
             if response.status in [403, 401]:
                 raise Forbidden()
             if response.status == 429:
-                logging.warning("Unexpected ratelimit. Re-syncing internal ratelimit handler (unless that's disabled).")
+                logging.warning("Unexpected ratelimit. Re-syncing internal ratelimit handler.")
                 data = await response.json()
-                if not self.ignore_local_ratelimit:
-                    if "/bots/" in uri:
-                        routes["/bots/*"].sync_from_ratelimit(data["retry-after"])
-                    routes["*"].sync_from_ratelimit(data["retry-after"])
+                if "/bots/" in uri:
+                    routes["/bots/*"].sync_from_ratelimit(data["retry-after"])
+                routes["*"].sync_from_ratelimit(data["retry-after"])
 
                 # NOTE: This is a bit of a whack way to deal with this.
                 # There should definitely be only one way to handle a ratelimit
