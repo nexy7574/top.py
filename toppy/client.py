@@ -32,9 +32,7 @@ class TopGG:
     class.
     """
 
-    def __init__(
-        self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True
-    ):
+    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True):
         r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
 
@@ -137,11 +135,7 @@ class TopGG:
             if response.status in range(500, 600):
                 raise TopGGServerError()
             else:
-                self.bot.dispatch(
-                    "toppy_request",
-                    url=url,
-                    method=method
-                )
+                self.bot.dispatch("toppy_request", url=url, method=method)
                 # NOTE: This has moved from just before the return since the hits count as soon as a response
                 # is generated (unless it's 5xx).
                 if "/bots/" in uri:
@@ -282,9 +276,7 @@ class TopGG:
             stats["shards"] = shards
             stats["shard_count"] = self.bot.shard_count
 
-        response = await self._request(
-            "POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats)
-        )
+        response = await self._request("POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats))
         logger.debug(f"Response from fetching posting stats: {response}")
         self.bot.dispatch("guild_post", stats)
         return stats["server_count"]
