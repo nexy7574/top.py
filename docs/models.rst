@@ -1,10 +1,12 @@
-.. py:currentmodule:: toppy.models
+.. module:: toppy.models
 
 Model Reference
 ===============
 
 This page will document every model that is returned, and used, by toppy.
 
+
+.. attributetable:: Bot
 
 .. autoclass:: Bot
     :inherited-members:
@@ -13,6 +15,7 @@ This page will document every model that is returned, and used, by toppy.
 .. autoclass:: User
     :inherited-members:
     :members:
+
 
 .. autoclass:: SimpleUser
     :inherited-members:

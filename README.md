@@ -19,6 +19,20 @@ top.py is a python wrapper for the top.gg discord bot list API. top.py aims to
 be object-oriented, whereas the official top.gg python SDK is more low-level raw
 data.
 
+### Installation
+
+You can install the latest stable release here:
+
+```shell
+pip install top.py
+```
+
+But, if you're reading this, you're most likely a developer - you should know
+how to install packages by now.
+
+### Examples
+You can see examples in the [examples.md](https://github.com/dragdev-studios/top.py/blob/master/examples.md) file.
+
 ### Supported Features
 
 <!-- ✅ ❌ -->
@@ -56,17 +70,6 @@ Just try it, you can choose what you like.
 Also, while we try to be our own package, you may notice we've aliased a few
 classes, functions and behavious to act like top.gg's sdk. This is mainly so you
 have an easier experience migrating, and it's less headache.
-
-## Installation
-
-You can install the latest stable release here:
-
-```shell
-pip install top.py
-```
-
-But, if you're reading this, you're most likely a developer - you should know
-how to install packages by now.
 
 ## Useful links
 

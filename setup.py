@@ -12,6 +12,7 @@ with open("./README.md", encoding="utf-8") as readme_file:
 with open("./toppy/client.py", encoding="utf-8") as client:
     ct = client.read()
     version = version_regex.search(ct).group("v")
+    assert version is not None
 
 setup(
     name="top.py",
@@ -28,6 +29,7 @@ setup(
     install_requires=reqs,
     extras_require={
         "tests": ["pytest", "flask", "requests"],
+        "docs": ["sphinx", "sphinx-rtd-dark-mode"]
     },
     python_requires=">=3.6",
     classifiers=[

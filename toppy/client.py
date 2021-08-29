@@ -193,7 +193,7 @@ class TopGG:
         :param offset: How many bots to "skip" (pagination)
         :param search: Search pairs (e.g. {"library": "discord.py"})
         :param sort: What field to sort by. Prefix with dash to reverse results.
-        :return: A BotSearchResults object
+        :return: A :class:`toppy.models.BotSearchResults` object
         """
         limit = max(2, min(500, limit))
         uri = "/bots?limit=" + str(limit)
@@ -215,13 +215,12 @@ class TopGG:
     async def bulk_fetch_bots(self, limit: int = 500, *args) -> dict:
         r"""Similar to fetch_bots, except allows for requesting more than 500.
 
-        This is equivalent to:
-        ```python
-        batch_one = await TopGG.fetch_bots(500)
-        batch_two = await TopGG.fetch_bots(500, offset=500)
-        batch_three = await TopGG.fetch_bots(500, offset=1000)
-        ...
-        ```
+        This is equivalent to: ::
+
+            batch_one = await TopGG.fetch_bots(500)
+            batch_two = await TopGG.fetch_bots(500, offset=500)
+            batch_three = await TopGG.fetch_bots(500, offset=1000)
+
         """
         results = {}
         remaining = limit
@@ -242,7 +241,12 @@ class TopGG:
         return resolved
 
     async def upvote_check(self, user: Union[discord.User, discord.Member, discord.Object]) -> bool:
-        r"""Checks to see if the provided user has voted for your bot in the pas 12 hours."""
+        r"""
+        Checks to see if the provided user has voted for your bot in the pas 12 hours.
+
+        :param user: The user to fetch upvote for.
+        :returns: :class:`bool` - True if the has user voted in the past 12 hours, False if not
+        """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         uri = f"/bots/{self.bot.user.id}/check?userId={user.id}"
@@ -264,7 +268,7 @@ class TopGG:
         r"""
         Posts your bot's current statistics to top.gg
 
-        :return: an integer of how many servers got posted.
+        :returns: :class:`int` - an integer of how many servers got posted.
         """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
