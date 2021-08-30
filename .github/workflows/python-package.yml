@@ -30,4 +30,4 @@ jobs:
         pip install -Ur requirements.txt
     - name: Lint with pycodestyle
       run: |
-        pycodestyle ./toppy --max-line-length=120 --count
+        pycodestyle ./toppy --config ./tox.ini
