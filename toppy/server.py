@@ -27,7 +27,9 @@ async def create_server(
 ):
     """
     Creates a vote webhook server.
+
     This will listen for webhooks on <host>:<port>[/<path>].
+
     MAKE SURE YOUR PORT IS FORWARDED AND THAT YOUR AUTH+PATH IS THE SAME AS THAT ON TOP.GG!
 
     :param bot: Your bot instance
@@ -36,7 +38,14 @@ async def create_server(
     :param path: The bit after your IP/domain. Defaults to /.
     :param auth: Your authorization you set on your top.gg bot settings. Please don't leave this blank. Please.
     :param disable_warnings: If True, this will disable any sort of warnings that may arise from the web server.
-    :return: An asyncio.Task containing the background wrap for running the server. You're responsible for cleanup.
+    :type bot: :class:`discord:discord.Client`
+    :type host: :class:`py:str`
+    :type port: :class:`py:int`
+    :type path: :class:`py:str`
+    :type auth: Optional[:class:`py:str`]
+    :type disable_warnings: :class:`py:bool`
+    :return: A task containing the background wrap for running the server. You're responsible for cleanup.
+    :rtype: :class:`py:asyncio.Task`
     """
     app = web.Application()
     app.add_routes([web.post(path, _create_callback(bot, auth, disable_warnings=disable_warnings))])

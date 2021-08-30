@@ -5,8 +5,9 @@ Model Reference
 
 This page will document every model that is returned, and used, by toppy.
 
+.. warning::
 
-.. attributetable:: Bot
+    These objects should not be manually created by users.
 
 .. autoclass:: Bot
     :inherited-members:

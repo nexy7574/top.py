@@ -1,11 +1,15 @@
 import asyncio
 import logging
 from json import dumps
-from typing import Union, List
+from typing import Union, List, Optional, Literal
+from pathlib import Path
 
 import aiohttp
-
 import discord
+try:
+    import aiosqlite
+except ModuleNotFoundError:
+    aiosqlite = None
 
 # noinspection PyPep8Naming
 from discord import Client as C, AutoShardedClient as AC
@@ -18,7 +22,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
 
-__version__ = "1.2.0"
+__version__ = "1.3.0-alpha.1"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
 logger = logging.getLogger(__name__)
@@ -32,27 +36,58 @@ class TopGG:
     class.
     """
 
-    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True):
+    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True,
+                 ratelimit_persistence: bool = False, persistence_file: Union[Path, Literal[":memory:"]] = None):
         r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
 
         Parameters
         ----------
-        bot:
+        bot: :obj:`discord.Client`
             The bot instance to use. Can be client or bot, and their auto-sharded equivalents.
-        token: :class:`str`
+        token: :obj:`py:str`
             Your bot's API token from top.gg.
-        autopost: :class:`bool`
+        autopost: :obj:`py:bool`
             Whether to automatically post server count every 30 minutes or not.
+        ratelimit_persistence: :class:`py:bool`
+            If enabled (and aiosqlite is installed), this will enable top.py to save your ratelimit information to a
+            local file.
+
+            If enabled, this will create a local file, ``top.py.db``. This will be an sqlite3 file that stores some
+            metadata about your ratelimit, and (in the future, & enabled), vote cache.
+
+            .. warning::
+                You should only enable this if you have sufficient storage. Granted, sqlite files don't use much space,
+                but it's something you should look out for if you're really squeezed for disk space.
+        persistence_file: Optional[:class:`py:pathlib.Path`]
+            The custom file location to save persistence data to. By default, this is ``./data/top.py.db``.
+
+            .. warning::
+                Setting this to ``:memory:`` will make the module use RAM instead.
+                While this makes it not persistent anymore, it does mean you can access the vote cache (when implemented)
         """
+        if ratelimit_persistence is True and aiosqlite is None:
+            raise RuntimeError("aiosqlite must be installed to use ratelimit persistence.")
         self.bot = bot
         self.token = token
+        self.ratelimit_persistence = True
+        self.persistence_file = persistence_file
         # noinspection PyTypeChecker
-        self.session = None  # type: aiohttp.ClientSession
+        self._session: Optional[aiohttp.ClientSession] = None
+        # noinspection PyTypeChecker
+        self._db: Optional[aiosqlite.Connection] = None
 
         if autopost:
             logger.debug("Starting autopost task.")
             self.autopost.start()
+
+        if isinstance(persistence_file, Path):
+            if not self.persistence_file.exists():
+                raise FileNotFoundError(self.persistence_file)
+        if self.persistence_file is None:
+            self.persistence_file = Path("./data/top.gg.db")
+            if not self.persistence_file.exists():
+                self.persistence_file.touch()  # just creates the file
 
         # Function aliases
         self.vote_check = self.upvote_check
@@ -71,8 +106,40 @@ class TopGG:
         self.autopost.stop()
 
     @property
+    def db(self) -> Optional[aiosqlite.Connection]:
+        r"""
+        Returns the current top.py database connection.
+
+        .. warning::
+            You must have at least called one function before using this variable, as the connection is not created
+            on class initialization.
+
+        :return: The current db
+        :rtype: :class:`aiosqlite:aiosqlite.Connection`
+        """
+        return self.db
+
+    @property
+    def session(self) -> Optional[aiohttp.ClientSession]:
+        r"""
+        Returns the current top.py client session.
+
+        .. warning::
+            You must have at least called one function before using this variable, as the connection is not created
+            on class initialization.
+
+        :return: The current aiohttp client session
+        :rtype: :class:`http:aiohttp.ClientSession`
+        """
+        return self._session
+
+    @property
     def vote_url(self) -> str:
-        r"""Just gives you a link to your bot's vote page."""
+        r"""
+        Just gives you a link to your bot's vote page.
+
+        :rtype: :class:`py:str`
+        """
         if not self.bot.is_ready():
             raise TypeError("Bot is not ready, can't produce a vote URL.")
         return f"https://top.gg/bot/{self.bot.user.id}/vote"
@@ -86,7 +153,7 @@ class TopGG:
 
     async def _wf_s(self):
         if not self.session:
-            self.session = aiohttp.ClientSession(
+            self._session = aiohttp.ClientSession(
                 headers={
                     "User-Agent": f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
                     "Authorization": self.token,
@@ -94,11 +161,26 @@ class TopGG:
                     "Accept": "application/json",
                 }
             )
+        if self.ratelimit_persistence is True and not self.db:
+            self._db = await aiosqlite.connect(
+                self.persistence_file
+            )
+            await self.db.execute(
+                """
+                CREATE TABLE IF NOT EXISTS ratelimit (
+                    route TEXT PRIMARY_KEY NOT NULL UNIQUE,
+                    hits INTEGER,
+                    reset_at TEXT
+                );
+                """
+            )
         return
 
     @loop(minutes=30)
     async def autopost(self):
         r"""The task that automatically posts our stats to top.gg."""
+        if not self.bot.is_ready():
+            await self.bot.wait_until_ready()
         result = await self.post_stats()
         self.bot.dispatch("toppy_stat_autopost", result)
 
@@ -176,7 +258,13 @@ class TopGG:
         Fetches a bot from top.gg
 
         :param bot: The bot's user to fetch
-        :return: A :class:`toppy.models.Bot` model
+        :type bot: Union[:class:`discord:discord.User`, :class:`discord:discord.Member`]
+        :return: The retrieved bot
+        :rtype: :class:`toppy.models.Bot`
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.Forbidden: You didn't specify a valid API token, or you are banned from the API.
+        :raises toppy.errors.NotFound: The specified bot is not on top.gg.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         response = await self._request("GET", "/bots/" + str(bot.id))
         response["state"] = self.bot
@@ -187,13 +275,21 @@ class TopGG:
         self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None
     ) -> BotSearchResults:
         r"""
-        Fetches up to :limit: bots from top.gg
+        Fetches up to ``limit`` bots from top.gg
 
         :param limit: How many bots to fetch.
         :param offset: How many bots to "skip" (pagination)
         :param search: Search pairs (e.g. {"library": "discord.py"})
         :param sort: What field to sort by. Prefix with dash to reverse results.
-        :return: A :class:`toppy.models.BotSearchResults` object
+        :type limit: :class:`py:int`
+        :type offset: :class:`py:int`
+        :type search: Optional[:class:`py:dict`]
+        :type sort: Optional[:class:`py:str`]
+        :return: The results of your search (up to ``limit`` results)
+        :rtype: :class:`toppy.models.BotSearchResults`
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.Forbidden: You didn't specify a valid API token, or you are banned from the API.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         limit = max(2, min(500, limit))
         uri = "/bots?limit=" + str(limit)
@@ -213,7 +309,20 @@ class TopGG:
         return BotSearchResults(*new_results, limit=limit, offset=offset)
 
     async def bulk_fetch_bots(self, limit: int = 500, *args) -> dict:
-        r"""Similar to fetch_bots, except allows for requesting more than 500.
+        r"""Similar to fetch_bots, except allows for requesting more than 500 bots at once.
+
+        .. warning::
+
+            This function is not guaranteed to return *exactly* ``limit``.
+
+            Keep in mind that it returns *up to* ``limit``
+
+        .. danger::
+
+            Since this function sends multiple requests, it can take a long time.
+
+            Furthermore, sending a bulk request for more than thirty thousand (30,000) bots will cause you to be
+            ratelimited.
 
         This is equivalent to: ::
 
@@ -221,18 +330,40 @@ class TopGG:
             batch_two = await TopGG.fetch_bots(500, offset=500)
             batch_three = await TopGG.fetch_bots(500, offset=1000)
 
+        :param limit: How many bots to fetch.
+        :param offset: How many bots to "skip" (pagination)
+        :param search: Search pairs (e.g. {"library": "discord.py"})
+        :param sort: What field to sort by. Prefix with dash to reverse results.
+        :type limit: :class:`py:int`
+        :type offset: :class:`py:int`
+        :type search: Optional[:class:`py:dict`]
+        :type sort: Optional[:class:`py:str`]
+        :return: The results of your search (up to ``limit`` results)
+        :rtype: :class:`toppy.models.BotSearchResults`
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.Forbidden: You didn't specify a valid API token, or you are banned from the API.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
+        if limit > 30_000:
+            raise ValueError("Cannot process more than 30 thousand bots at once (definite ratelimit)")
         results = {}
         remaining = limit
         for i in range(0, limit, 500):
             amount = min(500, remaining)
             batch_results = await self.fetch_bots(amount, offset=i, *args)
             remaining -= amount
-            results = {**results, **batch_results}
+            results = {**results, **{x.id: x for x in batch_results}}
         return results
 
     async def fetch_votes(self) -> List[SimpleUser]:
-        r"""Fetches the last 1000 voters for your bot."""
+        r"""
+        Fetches the last 1000 voters for your bot.
+
+        :returns: A list of up to 1000 SimpleUser objects who have voted for your bot in the past (any time period).
+        :rtype: :class:`py:list`[:class:`toppy.models.SimpleUser`]
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
+        """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes")
@@ -245,7 +376,10 @@ class TopGG:
         Checks to see if the provided user has voted for your bot in the pas 12 hours.
 
         :param user: The user to fetch upvote for.
-        :returns: :class:`bool` - True if the has user voted in the past 12 hours, False if not
+        :returns: True if the has user voted in the past 12 hours, False if not
+        :rtype: :class:`py:bool`
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
@@ -258,7 +392,12 @@ class TopGG:
     async def get_stats(self, bot: Union[discord.User, discord.Member, discord.Object]) -> BotStats:
         r"""Fetches the server & shard count for a bot.
 
-        NOTE: this does NOT fetch votes. Use the fetch_bot function for that."""
+        NOTE: this does NOT fetch votes. Use the fetch_bot function for that.
+
+        :returns: Basic statistics on the specified bot.
+        :rtype: :class:`toppy.models.BotStats`
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given."""
         uri = f"/bots/{bot.id}/stats"
         raw_stats = await self._request("GET", uri)
         logger.debug(f"Response from fetching stats: {raw_stats}")
@@ -268,7 +407,10 @@ class TopGG:
         r"""
         Posts your bot's current statistics to top.gg
 
-        :returns: :class:`int` - an integer of how many servers got posted.
+        :returns: an integer of how many servers got posted.
+        :rtype: :class:`py:int`
+        :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
@@ -288,7 +430,10 @@ class TopGG:
     async def is_weekend(self) -> bool:
         r"""Returns True or False, depending on if it's a "weekend".
 
-        If it's a weekend, votes count as double."""
+        If it's a weekend, votes count as double.
+
+        :rtype: :class:`py:bool:`
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given."""
         data = await self._request("GET", f"/weekend")
         return data["is_weekend"]
 

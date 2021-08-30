@@ -12,6 +12,7 @@ toppy version:
    :maxdepth: 1
 
    client.rst
+   webhook server.rst
    errors.rst
    ratelimiter.rst
    models.rst

@@ -36,7 +36,9 @@ def default_avatar_url(discrim: int):
     return f"https://cdn.discordapp.com/embed/avatars/{discrim % 5}.png"
 
 
-def calculate_avatar_url(user_id: int, _hash: str):
+def calculate_avatar_url(user_id: int, discrim: int, _hash: str):
+    if not _hash:
+        return default_avatar_url(discrim)
     return f"https://cdn.discordapp.com/avatars/{user_id}/{_hash}.webp"
 
 
@@ -68,7 +70,19 @@ class UserABC(_ReprMixin):
 
 
 class SimpleUser(_ReprMixin):
-    """A model representing the "simple user" object returned by /bots/{id}/votes."""
+    """
+    A model representing the "simple user" object returned by /bots/{id}/votes.
+
+    Attributes:
+        id: :class:`py:int`
+            The user's ID
+        discriminator: :class:`py:str`
+            The user's discriminator (prefixed with #)
+        username: :class:`py:str`
+            the user's username
+        avatar: Optional[:class:`py:str`]
+            The user's avatar URL
+    """
 
     def __init__(self, **kwargs):
         self.id: int = int(kwargs.pop("id"))
@@ -80,7 +94,20 @@ class SimpleUser(_ReprMixin):
 
 
 class Socials(_ReprMixin):
-    """Model containing every social link on a top.gg user's profile."""
+    """
+    Model containing every social link on a top.gg user's profile.
+
+    .. warning::
+        This class does not resolve URLs.
+
+    Attributes:
+        youtube: Optional[:class:`py:str`]
+        reddit: Optional[:class:`py:str`]
+        instagram: Optional[:class:`py:str`]
+        github: Optional[:class:`py:str`]
+        twitter: Optional[:class:`py:str`]
+
+    """
 
     def __init__(self, **kwargs):
         # NOTE:
@@ -164,7 +191,8 @@ class User(UserABC, _ReprMixin):
 
         There is an alias for this under toppy.models.User.color
 
-        :returns: discord.Colour - the resolved colour"""
+        :returns: discord.Colour - the resolved colour
+        :rtype: :class:`discord:discord.Colour`"""
         return self._colour
 
     @property
@@ -175,7 +203,9 @@ class User(UserABC, _ReprMixin):
     def user(self, state=None) -> Optional[DiscordUser]:
         """Gets the current discord user object from the top.gg user object.
 
-        state can be the bot/client instance, or anything with a get_user method."""
+        state can be the bot/client instance, or anything with a get_user method.
+
+        :rtype: Optional[:class:`discord:discord.User`]"""
         if not state:
             return self._user
         if self._user:
@@ -188,6 +218,59 @@ class Bot(UserABC, _ReprMixin):
     Model representing a top.gg bot
 
     This also conforms with the discord user ABC. See: toppy.models.User
+
+    Attributes:
+        id: :class:`py:int`
+            The bot's ID
+        discriminator: :class:`py:str`
+            The bot's discriminator (prefixed with #)
+        username: :class:`py:str`
+            the bot's username
+        avatar: :class:`py:str`
+            The bot's avatar hash
+        user_avatar: Optional[:class:`py:str`]
+            The bot's custom avatar hash
+        default_avatar: :class:`py:str`
+            The bot's default avatar hash
+        prefix: :class:`py:str`
+            The bot's prefix
+        short_description: :class:`py:str`
+            The bot's short description on top.gg
+        long_description: :class:`py:str`
+            The bot's long description on top.gg
+        tags: :class:`py:List`[:class:`py:str`]
+            A list of tags the bot uses on top.gg
+        website: Optional[:class:`py:str`]
+            The bot's website. Can be None.
+        support: Optional[:class:`py:str`]
+            The bots support server URL. Can be None
+        github: Optional[:class:`py:str`]
+            The bot's github repo page URL. Can be None.
+        owners: :class:`py:List`[:class:`py:int`]
+            A list of owner IDs that own this bot.
+        featured_guilds: :class:`py:List`[:class:`py:int`]
+            A list of featured guild IDs that are used on the bot's top.gg page
+        invite: :class:`py:str`
+            The bot's invite URL
+
+            .. danger::
+                This URL is not always a discord.com URL. If you are making requests to it, just be aware.
+
+        approved_at: :class:`py:datetime.datetime`
+            The datetime that this bot was approved at on top.gg
+
+            .. note::
+                This can sometimes fail to resolve the given timestamp, and defaults to :obj:`py:datetime.datetime.min`.
+        certified: :class:`py:bool`
+            Boolean indicating if this bot is certified on top.gg
+        vanity_uri: Optional[:class:`py:str`]
+            This bot's vanity endpoint on top.gg
+        all_time_votes: :class:`py:int`
+            The total number of votes this bot received the entire time it has been on top.gg
+        monthly_votes: :class:`py:int`
+            The total number of votes the bot got this month
+        donations_guild: Optional[`py:int`]
+            The server ID for donations using donatebot
     """
 
     def __init__(self, **kwargs):
@@ -237,7 +320,21 @@ class Bot(UserABC, _ReprMixin):
 
 
 class BotSearchResults(_ReprMixin):
-    """A container for search results."""
+    """
+    A container for search results.
+
+    Attributes:
+        results: :class:`py:tuple`[:class:`toppy.models.Bot`]
+            A tuple containing every found bot
+        limit: :class:`py:int`
+            The limit used
+        offset: :class:`py:int`
+            The offset used
+        count: :class:`py:int`
+            The total number of bots found
+        total: :class:`py:int`
+            An alias for ``count``
+    """
 
     # We love linting.
     results: Tuple[Bot]
