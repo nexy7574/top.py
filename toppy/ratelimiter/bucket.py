@@ -17,6 +17,7 @@ class Ratelimit:
         self.hits = 0
         self.cooldown = cooldown
         self.expires = datetime.min
+        self.calls = []
 
     @property
     def ratelimited(self) -> bool:

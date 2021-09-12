@@ -1,11 +1,11 @@
-import asyncio
 import logging
 from json import dumps
-from typing import Union, List, Optional, Literal
 from pathlib import Path
+from typing import Union, List, Optional, Literal
 
 import aiohttp
 import discord
+
 try:
     import aiosqlite
 except ModuleNotFoundError:
@@ -75,7 +75,8 @@ class TopGG:
         # noinspection PyTypeChecker
         self._session: Optional[aiohttp.ClientSession] = None
         # noinspection PyTypeChecker
-        self._db: Optional[aiosqlite.Connection] = None
+        if aiosqlite is not None:
+            self._db: Optional[aiosqlite.Connection] = None
 
         if autopost:
             logger.debug("Starting autopost task.")
@@ -94,30 +95,27 @@ class TopGG:
         self.has_upvoted = self.upvote_check
         self.get_user_vote = self.upvote_check
 
-        logger.debug(
-            f"TopGG [top.py] has been initialised:\n\t- bot: {id(self.bot)}\n\t- API Token: {self.token[:5]}...\n\t"
-            f"- Session: {id(self.session) if self.session else None}\n\t- Autoposting stats? "
-            f"{ {True: 'Y', False: 'N'}[autopost]}\n"
-        )
-
     def __del__(self):
         r"""Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
         logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
 
-    @property
-    def db(self) -> Optional[aiosqlite.Connection]:
-        r"""
-        Returns the current top.py database connection.
+    if aiosqlite is not None:
+        @property
+        def db(self) -> Optional[aiosqlite.Connection]:
+            r"""
+            Returns the current top.py database connection.
 
-        .. warning::
-            You must have at least called one function before using this variable, as the connection is not created
-            on class initialization.
+            .. warning::
+                You must have at least called one function before using this variable, as the connection is not created
+                on class initialization.
 
-        :return: The current db
-        :rtype: :class:`aiosqlite:aiosqlite.Connection`
-        """
-        return self.db
+                Furthermore, if aiosqlite is not installed, this property will be inaccessible.
+
+            :return: The current db
+            :rtype: :class:`aiosqlite:aiosqlite.Connection`
+            """
+            return self.db
 
     @property
     def session(self) -> Optional[aiohttp.ClientSession]:
@@ -161,14 +159,14 @@ class TopGG:
                     "Accept": "application/json",
                 }
             )
-        if self.ratelimit_persistence is True and not self.db:
+        if aiosqlite is not None and self.ratelimit_persistence is True and not self.db:
             self._db = await aiosqlite.connect(
                 self.persistence_file
             )
             await self.db.execute(
                 """
                 CREATE TABLE IF NOT EXISTS ratelimit (
-                    route TEXT PRIMARY_KEY NOT NULL UNIQUE,
+                    bucket TEXT PRIMARY_KEY NOT NULL UNIQUE,
                     hits INTEGER,
                     reset_at TEXT
                 );

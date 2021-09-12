@@ -6,6 +6,7 @@
 ![supported python versions: unresolved](https://img.shields.io/pypi/pyversions/top.py?style=flat-square)
 ![downloads: unresolved](https://img.shields.io/pypi/dw/top.py?style=flat-square)
 ![code style: black](https://img.shields.io/badge/code%20style-black-black?style=flat-square)
+![discord.py version: 1.x, 2.0a](https://img.shields.io/badge/discord.py-1.x%20%7C%202.0a-blue)
 
 An alternative wrapper for the [top.gg API](//docs.top.gg)
 
@@ -35,6 +36,7 @@ You can see examples in the [examples.md](https://github.com/dragdev-studios/top
 
 ### Supported Features
 
+<!-- Note to contributors: Use these emojis below 
 <!-- ✅ ❌ -->
 
 | Feature Name                        | Supported? |
@@ -55,21 +57,11 @@ You can see examples in the [examples.md](https://github.com/dragdev-studios/top
 **NOTE:** We do **NOT** currently provide official support for discord server
 list. That's coming soon.
 
-### Why use top.py over top.gg's sdk?
+### top.py features:
 
-It's entirely up to your personal preference. But here's a few differences
-between this and the official sdk:
-
-- top.py is object-oriented - this means everything has a class, meaning no
-  fiddling with raw data values from top.gg.
-- top.py is more humanised - top.py is designed with ease of use in mind, so you
-  may find there is a smoother experience implementing this than top.gg's sdk.
-
-Just try it, you can choose what you like.
-
-Also, while we try to be our own package, you may notice we've aliased a few
-classes, functions and behavious to act like top.gg's sdk. This is mainly so you
-have an easier experience migrating, and it's less headache.
+* Object-Oriented (No-more shall you faff about with dictionaries)
+* Sensible function names & arguments
+* 
 
 ## Useful links
 

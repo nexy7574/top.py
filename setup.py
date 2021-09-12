@@ -1,5 +1,6 @@
-from setuptools import setup
 from re import compile
+
+from setuptools import setup
 
 version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
 
@@ -30,7 +31,7 @@ setup(
     extras_require={
         "tests": ["pytest", "flask", "requests"],
         "docs": ["sphinx", "sphinx-rtd-dark-mode"],
-        "ratelimit-persistence": ["aiosqlite"]
+        "ratelimit-persistence": ["orm[aiosqlite]"]
     },
     python_requires=">=3.6",
     classifiers=[
