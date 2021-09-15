@@ -15,7 +15,7 @@ You can get a version from :obj:`toppy.client.__version__`
 
 Client
 ~~~~~~
-.. autoclass:: toppy.TopGG
+.. autoclass:: TopGG
     :members:
 
 Event Reference
