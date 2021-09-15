@@ -1,6 +1,7 @@
-import datetime
-from typing import Literal
+from datetime import datetime
+from typing import Literal, Optional, List, Union, Iterable
 
+import discord
 from aiosqlite import Connection
 
 
@@ -16,13 +17,16 @@ class Vote:
             vote_id,
             user_id,
             vote_worth,
-            datetime.datetime.utcfromtimestamp(voted_at)
+            datetime.utcfromtimestamp(voted_at)
         )
 
     @property
-    def vote_id(self) -> int:
+    def vote_id(self) -> Optional[int]:
         """
         The internal ID of this vote. Only used for the database.
+
+        .. warning::
+            This is ``None`` ONLY if returned by :meth:`SQLManager.create_vote`.
 
         :returns: An incremental integer
         :rtype: :class:`py:int`
@@ -53,7 +57,7 @@ class Vote:
         return self.__data[2]
 
     @property
-    def timestamp(self) -> datetime.datetime:
+    def timestamp(self) -> datetime:
         """
         A (naive) :class:`py:datetime.datetime` for when this vote was cast.
 
@@ -68,5 +72,89 @@ class SQLManager:
     def __init__(self, connection: Connection):
         self.connection = connection
 
-    async def get_vote(self, vote_id: int):
-        pass
+    async def __init(self):
+        statements = (
+            """
+            CREATE TABLE IF NOT EXISTS votes (
+                vote_id INTEGER PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                vote_worth INTEGER CHECK(vote_worth>0 AND vote_worth<2),
+                timestamp REAL NOT NULL
+            );
+            """,
+        )
+        for statement in statements:
+            await self.connection.execute(statement)
+        await self.connection.commit()
+
+    async def execute(self, *args, **kwargs):
+        await self.__init()
+        return await self.connection.execute(*args, **kwargs)
+
+    async def get_vote(self, vote_id: int) -> Optional[Vote]:
+        async with self.execute(
+            """
+            SELECT vote_id, user_id, vote_worth, timestamp
+            FROM votes
+            WHERE vote_id=?;
+            """,
+                (vote_id,)
+        ) as cursor:
+            row = await cursor.fetchone()
+            if row is None:
+                return
+            return Vote(*row)
+
+    async def get_votes(self, *, before: datetime = None, after: datetime = None):
+        votes = []
+        for vote in await self.get_all_votes():  # needless computation but who cares :)
+            if before is not None:
+                if vote.timestamp > before:
+                    continue
+            if after is not None:
+                if vote.timestamp < after:
+                    continue
+            votes.append(vote)
+        return votes
+
+    async def get_all_votes(self, *, limit: int = None) -> List[Vote]:
+        votes = []
+        async with self.execute(
+            """
+            SELECT vote_id, user_id, vote_worth, timestamp
+            FROM votes;
+            """
+        ) as cursor:
+            async for row in cursor:
+                if limit is not None and len(votes) >= limit:
+                    break
+                votes.append(Vote(*row))
+        return votes
+
+    async def get_votes_by(self, user: Union[discord.User, discord.Member]) -> Iterable[Vote]:
+        async with self.execute(
+            """
+            SELECT vote_id, user_id, vote_worth, timestamp
+            FROM votes
+            WHERE user_id=?;
+            """,
+                (user.id,)
+        ) as cursor:
+            return map(lambda v: Vote(*v), await cursor.fetchall())
+
+    async def create_vote(self, user: Union[discord.User, discord.Member], vote_worth: Literal[1, 2]) -> Vote:
+        now = datetime.utcnow()
+        await self.execute(
+            """
+            INSERT INTO votes (vote_id, user_id, vote_worth, timestamp)
+            VALUES (null, ?, ?, ?);
+            """,
+            (
+                user.id,
+                vote_worth,
+                now.timestamp()
+            )
+        )
+        await self.connection.commit()
+        # noinspection PyTypeChecker
+        return Vote(None, user.id, vote_worth, now.timestamp())

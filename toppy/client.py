@@ -37,7 +37,7 @@ class TopGG:
     """
 
     def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True,
-                 ratelimit_persistence: bool = False, persistence_file: Union[Path, Literal[":memory:"]] = None):
+                 ratelimit_persistence: bool = ..., persistence_file: Union[Path, Literal[":memory:"]] = None):
         r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
 
@@ -66,6 +66,7 @@ class TopGG:
                 Setting this to ``:memory:`` will make the module use RAM instead.
                 While this makes it not persistent anymore, it does mean you can access the vote cache (when implemented)
         """
+        assert ratelimit_persistence is ..., "Ratelimit persistence is not ready to use yet."
         if ratelimit_persistence is True and aiosqlite is None:
             raise RuntimeError("aiosqlite must be installed to use ratelimit persistence.")
         self.bot = bot
@@ -162,15 +163,6 @@ class TopGG:
         if aiosqlite is not None and self.ratelimit_persistence is True and not self.db:
             self._db = await aiosqlite.connect(
                 self.persistence_file
-            )
-            await self.db.execute(
-                """
-                CREATE TABLE IF NOT EXISTS ratelimit (
-                    bucket TEXT PRIMARY_KEY NOT NULL UNIQUE,
-                    hits INTEGER,
-                    reset_at TEXT
-                );
-                """
             )
         return
 
