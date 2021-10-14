@@ -1,6 +1,6 @@
 from re import compile
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
 
@@ -18,7 +18,7 @@ with open("./toppy/client.py", encoding="utf-8") as client:
 setup(
     name="top.py",
     version=version,
-    packages=["toppy", "toppy.models", "toppy.errors", "toppy.ratelimiter"],
+    packages=find_packages("tests"),
     url="https://github.com/dragdev-studios/top.py",
     license="MIT",
     author="EEKIM10",
@@ -42,6 +42,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: Internet",
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",

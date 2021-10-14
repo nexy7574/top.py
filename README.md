@@ -16,6 +16,10 @@ package, please see [their repo](//github.com/top-gg/python-sdk)._
 
 ## Introduction
 
+> Warning! top.py is not tested to be compatible with discord.py forks, or any other library than the official 
+> discord.py library. If you encounter issues when using another library, please open an issue with as much detail
+> and support will be added.
+
 top.py is a python wrapper for the top.gg discord bot list API. top.py aims to
 be object-oriented, whereas the official top.gg python SDK is more low-level raw
 data.
