@@ -31,4 +31,5 @@ jobs:
       run: |
         pycodestyle ./toppy --config ./tox.ini
     - name: Test with pytest
-        pytest -vvvv
+      run: |
+        pytest
