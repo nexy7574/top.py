@@ -1,11 +1,19 @@
+from os import chdir
+from pathlib import Path
 from re import compile
+from warnings import warn
 
 from setuptools import setup, find_packages
 
-version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
+warn(
+    DeprecationWarning("The setup.py install for this project is deprecated.")
+)
 
-with open("./requirements.txt", encoding="utf-8") as requirements:
-    reqs = requirements.read().splitlines()
+chdir(Path(__file__).parent)
+
+version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)((a|b|(r)?c)[0-9]+)?\"")
+
+reqs = ["discord.py>=1.5.0"]
 
 with open("./README.md", encoding="utf-8") as readme_file:
     readme = readme_file.read()
