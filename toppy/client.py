@@ -4,15 +4,8 @@ from typing import Union, List, Optional
 
 import aiohttp
 import discord
-
-try:
-    import aiosqlite
-except ModuleNotFoundError:
-    aiosqlite = None
-
 # noinspection PyPep8Naming
 from discord import Client as C, AutoShardedClient as AC
-
 # noinspection PyPep8Naming
 from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
