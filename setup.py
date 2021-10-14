@@ -31,7 +31,7 @@ setup(
     extras_require={
         "tests": ["pytest", "flask", "requests"],
         "docs": ["sphinx", "sphinx-rtd-dark-mode"],
-        "ratelimit-persistence": ["orm[aiosqlite]"]
+        "ratelimit-persistence": ["orm[aiosqlite]"],
     },
     python_requires=">=3.6",
     classifiers=[

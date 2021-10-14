@@ -41,14 +41,14 @@ extensions = ["sphinx.ext.autodoc", "sphinx.ext.duration", "sphinx.ext.intersphi
 
 intersphinx_mapping = {
     "discord": ("https://discordpy.readthedocs.io/en/stable", None),
-    "py": ('https://docs.python.org/3', None),
+    "py": ("https://docs.python.org/3", None),
     "aiosqlite": ("https://aiosqlite.omnilib.dev/en/stable/", None),
-    "http": ("https://docs.aiohttp.org/en/stable/", None)
+    "http": ("https://docs.aiohttp.org/en/stable/", None),
 }
 extlinks = {
     "issue": ("https://github.com/dragdev-studios/top.py/issues/%s", "GH-"),
 }
-autodoc_member_order = 'bysource'
+autodoc_member_order = "bysource"
 
 default_dark_mode = True
 source_suffix = {

@@ -1,7 +1,6 @@
 import logging
 from json import dumps
-from pathlib import Path
-from typing import Union, List, Optional, Literal
+from typing import Union, List, Optional
 
 import aiohttp
 import discord
@@ -22,7 +21,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
 
-__version__ = "1.3.0-alpha.1"
+__version__ = "1.3.0-alpha.2"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
 logger = logging.getLogger(__name__)
@@ -36,8 +35,7 @@ class TopGG:
     class.
     """
 
-    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True,
-                 ratelimit_persistence: bool = ..., persistence_file: Union[Path, Literal[":memory:"]] = None):
+    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True):
         r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
 
@@ -49,30 +47,10 @@ class TopGG:
             Your bot's API token from top.gg.
         autopost: :obj:`py:bool`
             Whether to automatically post server count every 30 minutes or not.
-        ratelimit_persistence: :class:`py:bool`
-            If enabled (and aiosqlite is installed), this will enable top.py to save your ratelimit information to a
-            local file.
-
-            If enabled, this will create a local file, ``top.py.db``. This will be an sqlite3 file that stores some
-            metadata about your ratelimit, and (in the future, & enabled), vote cache.
-
-            .. warning::
-                You should only enable this if you have sufficient storage. Granted, sqlite files don't use much space,
-                but it's something you should look out for if you're really squeezed for disk space.
-        persistence_file: Optional[:class:`py:pathlib.Path`]
-            The custom file location to save persistence data to. By default, this is ``./data/top.py.db``.
-
-            .. warning::
-                Setting this to ``:memory:`` will make the module use RAM instead.
-                While this makes it not persistent anymore, it does mean you can access the vote cache (when implemented)
         """
-        assert ratelimit_persistence is ..., "Ratelimit persistence is not ready to use yet."
-        if ratelimit_persistence is True and aiosqlite is None:
-            raise RuntimeError("aiosqlite must be installed to use ratelimit persistence.")
         self.bot = bot
         self.token = token
         self.ratelimit_persistence = True
-        self.persistence_file = persistence_file
         # noinspection PyTypeChecker
         self._session: Optional[aiohttp.ClientSession] = None
         # noinspection PyTypeChecker
@@ -83,14 +61,6 @@ class TopGG:
             logger.debug("Starting autopost task.")
             self.autopost.start()
 
-        if isinstance(persistence_file, Path):
-            if not self.persistence_file.exists():
-                raise FileNotFoundError(self.persistence_file)
-        if self.persistence_file is None:
-            self.persistence_file = Path("./data/top.gg.db")
-            if not self.persistence_file.exists():
-                self.persistence_file.touch()  # just creates the file
-
         # Function aliases
         self.vote_check = self.upvote_check
         self.has_upvoted = self.upvote_check
@@ -100,23 +70,6 @@ class TopGG:
         r"""Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
         logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
-
-    if aiosqlite is not None:
-        @property
-        def db(self) -> Optional[aiosqlite.Connection]:
-            r"""
-            Returns the current top.py database connection.
-
-            .. warning::
-                You must have at least called one function before using this variable, as the connection is not created
-                on class initialization.
-
-                Furthermore, if aiosqlite is not installed, this property will be inaccessible.
-
-            :return: The current db
-            :rtype: :class:`aiosqlite:aiosqlite.Connection`
-            """
-            return self.db
 
     @property
     def session(self) -> Optional[aiohttp.ClientSession]:
@@ -159,10 +112,6 @@ class TopGG:
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                 }
-            )
-        if aiosqlite is not None and self.ratelimit_persistence is True and not self.db:
-            self._db = await aiosqlite.connect(
-                self.persistence_file
             )
         return
 
@@ -393,9 +342,12 @@ class TopGG:
         logger.debug(f"Response from fetching stats: {raw_stats}")
         return BotStats(**raw_stats)
 
-    async def post_stats(self) -> int:
+    async def post_stats(self, force_shard_count: bool = False) -> int:
         r"""
         Posts your bot's current statistics to top.gg
+
+        :type force_shard_count: :class:`py:bool`
+        :param force_shard_count: If true, always include shard data, even when it would normally be excluded
 
         :returns: an integer of how many servers got posted.
         :rtype: :class:`py:int`
@@ -405,12 +357,12 @@ class TopGG:
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         stats = {"server_count": len(self.bot.guilds)}
-        if hasattr(self.bot, "shards") and self.bot.shards:
+        if (hasattr(self.bot, "shards") and self.bot.shards) or force_shard_count is True:
             shards = []
             for shard in self.bot.shards.values():
                 shards.append(len([x for x in self.bot.guilds if x.shard_id == shard.id]))
             stats["shards"] = shards
-            stats["shard_count"] = self.bot.shard_count
+            stats["shard_count"] = max(self.bot.shard_count, 1)
 
         response = await self._request("POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats))
         logger.debug(f"Response from fetching posting stats: {response}")
