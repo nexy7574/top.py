@@ -14,7 +14,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
 
-__version__ = "1.3.0a4"
+__version__ = "1.3.1"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
 logger = logging.getLogger(__name__)
@@ -46,10 +46,6 @@ class TopGG:
         self.ratelimit_persistence = True
         # noinspection PyTypeChecker
         self._session: Optional[aiohttp.ClientSession] = None
-        # noinspection PyTypeChecker
-        if aiosqlite is not None:
-            self._db: Optional[aiosqlite.Connection] = None
-
         if autopost:
             logger.debug("Starting autopost task.")
             self.autopost.start()
