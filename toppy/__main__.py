@@ -14,7 +14,10 @@ parser.add_argument("-V", "--version", help="Display version information", actio
 args = parser.parse_args()
 
 if args.version:
-    pip_version = run(("pip", "--version"), stdout=PIPE, stderr=DEVNULL).stdout.split(b" ")[1].decode()
+    try:
+        pip_version = run(("pip", "--version"), stdout=PIPE, stderr=DEVNULL).stdout.split(b" ")[1].decode()
+    except FileNotFoundError:
+        pip_version = "VERSION UNAVAILABLE"
     print("-" * 15)
     print(f"Python Version: {'.'.join(map(str, sys.version_info[:3]))} (pip {pip_version})")
     print(f"Platform: {sys.platform}", end="")
