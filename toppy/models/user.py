@@ -172,7 +172,7 @@ class User(UserABC, _ReprMixin):
 
         If the user doesn't have an avatar, this will return their default one."""
         if self._avatar:
-            return calculate_avatar_url(self.id, self._avatar)
+            return calculate_avatar_url(self.id, self.discriminator, self._avatar)
         return default_avatar_url(int(self.discriminator))
 
     @property
