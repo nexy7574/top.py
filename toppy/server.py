@@ -22,7 +22,18 @@ def _create_callback(bot, auth, *, disable_warnings: bool = False):
     return callback
 
 
-async def create_server(
+async def _init_server(
+    bot, *, host: str = "0.0.0.0", port: int = 8080, path: str = "/", auth: str = None, disable_warnings: bool = False
+):
+    app = web.Application()
+    app.add_routes([web.post(path, _create_callback(bot, auth, disable_warnings=disable_warnings))])
+    runner = web.AppRunner(app)
+    await runner.setup()
+    webserver = web.TCPSite(runner, host, port)
+    return await webserver.start()
+
+
+def create_server(
     bot, *, host: str = "0.0.0.0", port: int = 8080, path: str = "/", auth: str = None, disable_warnings: bool = False
 ):
     """
@@ -32,11 +43,18 @@ async def create_server(
 
     MAKE SURE YOUR PORT IS FORWARDED AND THAT YOUR AUTH+PATH IS THE SAME AS THAT ON TOP.GG!
 
+    Example:
+        .. code-block::
+
+            from toppy.server import create_server
+            bot.vote_server = create_server(
+
+
     :param bot: Your bot instance
     :param host: The host to run this on. Usually, it's fine to leave this default.
     :param port: The port to listen to. Make sure it's forwarded. This defaults to 8080.
     :param path: The bit after your IP/domain. Defaults to /.
-    :param auth: Your authorization you set on your top.gg bot settings. Please don't leave this blank. Please.
+    :param auth: Your authorization you set on your top.gg bot settings.
     :param disable_warnings: If True, this will disable any sort of warnings that may arise from the web server.
     :type bot: :class:`discord:discord.Client`
     :type host: :class:`py:str`
@@ -47,9 +65,22 @@ async def create_server(
     :return: A task containing the background wrap for running the server. You're responsible for cleanup.
     :rtype: :class:`py:asyncio.Task`
     """
-    app = web.Application()
-    app.add_routes([web.post(path, _create_callback(bot, auth, disable_warnings=disable_warnings))])
-    runner = web.AppRunner(app)
-    await runner.setup()
-    webserver = web.TCPSite(runner, host, port)
-    return bot.loop.create_task(webserver.start())
+    if not bool(auth):
+        raise ValueError("An authentication token must be provided to the top.py server (as of 1.4.0a1).")
+
+    if not all(x.isdigit() for x in host.split(".")):
+        raise TypeError("%r does not appear to be a valid IP." % host)
+
+    if not path.startswith("/"):
+        raise ValueError("%r should start with a leading slash (for example: /vote)")
+
+    return bot.loop.create_task(
+        _init_server(
+            bot,
+            host=host,
+            port=port,
+            path=path,
+            auth=auth,
+            disable_warnings=disable_warnings
+        )
+    )

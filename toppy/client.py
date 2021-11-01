@@ -1,11 +1,13 @@
 import logging
+import traceback
+import warnings
 from json import dumps
-from typing import Union, List, Optional
+from typing import Union, List, Optional, Callable, Any
 
 import aiohttp
 import discord
 # noinspection PyPep8Naming
-from discord import Client as C, AutoShardedClient as AC
+from discord import Client
 # noinspection PyPep8Naming
 from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
@@ -14,7 +16,7 @@ from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFou
 from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
 
-__version__ = "1.3.1"
+__version__ = "2.0.0dev1"
 __api_version__ = "v0"
 _base_ = "https://top.gg/api"
 logger = logging.getLogger(__name__)
@@ -22,28 +24,61 @@ logger = logging.getLogger(__name__)
 
 class TopGG:
     r"""
-    The client class for the top.gg API.
+    Handles and processes all the transactions between your code and top.gg's API.
 
-    This class handles everything for the top.gg API, APART FROM voting webhooks - Those are handled by the server
-    class.
-    """
+    **Parameters:**
 
-    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True):
-        r"""
-        Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
-
-        Parameters
-        ----------
         bot: :obj:`discord.Client`
             The bot instance to use. Can be client or bot, and their auto-sharded equivalents.
         token: :obj:`py:str`
             Your bot's API token from top.gg.
         autopost: :obj:`py:bool`
             Whether to automatically post server count every 30 minutes or not.
-        """
+        event_callback: :obj:`Optional[Callable[[str, Optional[Any], Optional[Any]], Any]]`
+            The function to use when dispatching any of the events used in this library (see: event reference).
+            The only guaranteed argument is the event name, which is the first argument provided.
+            Any argument after that is dependant on what the event provides.
+
+            .. warning::
+                If this option is not overridden, it will default to ``bot.dispatch``, which some discord.py forks
+                may not have.
+
+            Example:
+
+            .. code-block::
+
+                # python 3.10
+                from toppy.client import TopGG
+
+                async def on_toppy_event(event_name, *args):
+                    match event_name:
+                        case "toppy_request":
+                            print("top.py sent a %s request to %s." % args)
+                        case "guild_post":
+                            print("Posted server count:", args[0]["server_count"]
+                        case _:
+                            print("Unhandled event:", event_name)
+
+                client = TopGG(..., event_callback=on_toppy_event)
+    """
+    # TODO: Fix that title in the docstring
+
+    def __init__(self, bot: Client, *, token: str, autopost: bool = True,
+                 event_callback: Optional[Callable[[str, Optional[Any], Optional[Any]], Any]] = ...):
         self.bot = bot
         self.token = token
         self.ratelimit_persistence = True
+        self._callback = event_callback
+        if self._callback is ...:
+            if hasattr(self.bot, "dispatch"):
+                self._callback = self.bot.dispatch
+            else:
+                def no_op(*args):
+                    return args  # the callback is never checked on our end
+
+                self._callback = no_op
+                warnings.warn("No valid callback found - defaulting to no-top")
+
         # noinspection PyTypeChecker
         self._session: Optional[aiohttp.ClientSession] = None
         if autopost:
@@ -59,6 +94,15 @@ class TopGG:
         r"""Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
         logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
+    
+    async def callback(self, event_name, *args):
+        try:
+            await discord.utils.maybe_coroutine(self._callback, event_name, *args)
+        except Exception as e:
+            print("Ignoring exception in top.py callback function:")
+            traceback.print_exception(type(e), e, e.__traceback__)
+        finally:
+            return
 
     @property
     def session(self) -> Optional[aiohttp.ClientSession]:
@@ -110,7 +154,7 @@ class TopGG:
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         result = await self.post_stats()
-        self.bot.dispatch("toppy_stat_autopost", result)
+        await self.callback("toppy_stat_autopost", result)
 
     async def _request(self, method: str, uri: str, **kwargs) -> dict:
         # Hello fellow code explorer!
@@ -145,7 +189,7 @@ class TopGG:
             if response.status in range(500, 600):
                 raise TopGGServerError()
             else:
-                self.bot.dispatch("toppy_request", url=url, method=method)
+                await self.callback("toppy_request", url, method)
                 # NOTE: This has moved from just before the return since the hits count as soon as a response
                 # is generated (unless it's 5xx).
                 if "/bots/" in uri:
@@ -355,7 +399,7 @@ class TopGG:
 
         response = await self._request("POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats))
         logger.debug(f"Response from fetching posting stats: {response}")
-        self.bot.dispatch("guild_post", stats)
+        await self.callback("guild_post", stats)
         return stats["server_count"]
 
     async def is_weekend(self) -> bool:

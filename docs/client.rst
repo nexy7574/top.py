@@ -1,7 +1,8 @@
 .. currentmodule:: toppy
 
+#############
 API Reference
-=============
+#############
 This page will describe top.py's client class and it's attributes.
 
 .. note::
@@ -10,16 +11,16 @@ This page will describe top.py's client class and it's attributes.
     You're not missing much if you don't set it up.
 
 Version
-~~~~~~~
+=======
 You can get a version from :obj:`toppy.client.__version__`
 
 Client
-~~~~~~
+======
 .. autoclass:: TopGG
     :members:
 
 Event Reference
-~~~~~~~~~~~~~~~
+===============
 
 _Note: all events must be async._
 

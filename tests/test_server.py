@@ -10,7 +10,7 @@ POST_DATA = {
     "user": "421698654189912064",
     "type": "test",
     "isWeekend": False,
-    "query": "?test=data&notRandomNumber=8",
+    "query": "?test=data&notRandomNumber=0",
 }
 
 
