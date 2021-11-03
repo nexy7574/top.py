@@ -11,7 +11,7 @@ warn(
 
 chdir(Path(__file__).parent)
 
-version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)((a|b|(r)?c)[0-9]+)?\"")
+version_regex = compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)((dev|a|b|(r)?c)[0-9]+)?\"")
 
 reqs = ["discord.py>=1.5.0"]
 
