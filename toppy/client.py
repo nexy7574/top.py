@@ -6,10 +6,7 @@ from typing import Union, List, Optional, Callable, Any
 
 import aiohttp
 import discord
-# noinspection PyPep8Naming
 from discord import Client
-# noinspection PyPep8Naming
-from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
 
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
@@ -67,7 +64,6 @@ class TopGG:
                  event_callback: Optional[Callable[[str, Optional[Any], Optional[Any]], Any]] = ...):
         self.bot = bot
         self.token = token
-        self.ratelimit_persistence = True
         self._callback = event_callback
         if self._callback is ...:
             if hasattr(self.bot, "dispatch"):
@@ -77,12 +73,11 @@ class TopGG:
                     return args  # the callback is never checked on our end
 
                 self._callback = no_op
-                warnings.warn("No valid callback found - defaulting to no-top")
+                warnings.warn("No valid callback found - defaulting to no-op")
 
         # noinspection PyTypeChecker
         self._session: Optional[aiohttp.ClientSession] = None
         if autopost:
-            logger.debug("Starting autopost task.")
             self.autopost.start()
 
         # Function aliases
@@ -91,8 +86,6 @@ class TopGG:
         self.get_user_vote = self.upvote_check
 
     def __del__(self):
-        r"""Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
-        logger.debug(f"{id(self)} __del__ called - Stopping autopost task")
         self.autopost.stop()
     
     async def callback(self, event_name, *args):
@@ -240,7 +233,6 @@ class TopGG:
         """
         response = await self._request("GET", "/bots/" + str(bot.id))
         response["state"] = self.bot
-        logger.debug(f"Response from fetch_bot: {response}")
         return Bot(**response)
 
     async def fetch_bots(
@@ -273,7 +265,6 @@ class TopGG:
         if offset:
             uri += "&offset=" + str(offset)
         result = await self._request("GET", "/bots")
-        logger.debug(f"Response from fetching bots: {result}")
         new_results = []
         for bot in result["results"]:
             bot["state"] = self.bot
@@ -320,11 +311,23 @@ class TopGG:
             raise ValueError("Cannot process more than 30 thousand bots at once (definite ratelimit)")
         results = {}
         remaining = limit
-        for i in range(0, limit, 500):
-            amount = min(500, remaining)
-            batch_results = await self.fetch_bots(amount, offset=i, *args)
-            remaining -= amount
-            results = {**results, **{x.id: x for x in batch_results}}
+        for i in range(remaining // 500):
+            batch = await self.fetch_bots(500, offset=i*500, *args)
+            results.update(
+                {
+                    bot.id: bot
+                    for bot in batch.results
+                }
+            )
+            remaining -= 500
+        if remaining > 0:
+            batch = await self.fetch_bots(remaining, offset=len(results), *args)
+            results.update(
+                {
+                    bot.id: bot
+                    for bot in batch.results
+                }
+            )
         return results
 
     async def fetch_votes(self) -> List[SimpleUser]:
