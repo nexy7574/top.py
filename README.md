@@ -1,12 +1,12 @@
 # Top.py
 
-![issues: unresolved](https://img.shields.io/github/issues/dragdev-studios/top.py?style=flat-square)
-![pull requests: unresolved](https://img.shields.io/github/issues-pr/dragdev-studios/top.py?style=flat-square)
-![version: unresolved](https://img.shields.io/pypi/v/top.py?style=flat-square)
-![supported python versions: unresolved](https://img.shields.io/pypi/pyversions/top.py?style=flat-square)
-![downloads: unresolved](https://img.shields.io/pypi/dw/top.py?style=flat-square)
-![code style: black](https://img.shields.io/badge/code%20style-black-black?style=flat-square)
-![discord.py version: 1.x, 2.0a](https://img.shields.io/badge/discord.py-1.x%20%7C%202.0a-blue)
+![issues: unresolved](https://img.shields.io/github/issues/dragdev-studios/top.py?style=for-the-badge)
+![pull requests: unresolved](https://img.shields.io/github/issues-pr/dragdev-studios/top.py?style=for-the-badge)
+![version: unresolved](https://img.shields.io/pypi/v/top.py?style=for-the-badge)
+![supported python versions: unresolved](https://img.shields.io/pypi/pyversions/top.py?style=for-the-badge)
+![downloads: unresolved](https://img.shields.io/pypi/dw/top.py?style=for-the-badge)
+![code style: black](https://img.shields.io/badge/code%20style-black-black?style=for-the-badge)
+![discord.py version: 1.x, 2.0a](https://img.shields.io/badge/discord.py-1.x%20%7C%202.0a-blue?style=for-the-badge)
 
 An alternative wrapper for the [top.gg API](//docs.top.gg)
 
