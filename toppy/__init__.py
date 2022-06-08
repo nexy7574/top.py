@@ -1,8 +1,10 @@
 from sys import version_info as python_version_info
+
 try:
     from discord import version_info as discord_version_info
 except ImportError as e:
-    raise ImportError("A module with the 'discord' namespace is not installed.") from e
+    raise ImportError(
+        "A module with the 'discord' namespace is not installed.") from e
 from warnings import warn
 
 if python_version_info <= (3, 6, 0) and discord_version_info >= (1, 8, 0):
@@ -12,5 +14,10 @@ if python_version_info <= (3, 6, 0) and discord_version_info >= (1, 8, 0):
         DeprecationWarning,
     )
 
-from .models import large_widget, small_widget, ColourOptions, ColourOptions as ColorOptions, Bot, User
-from .client import TopGG, TopGG as Client, TopGG as DBLClient
+from .client import TopGG
+from .client import TopGG as Client
+from .client import TopGG as DBLClient
+from .models import Bot
+from .models import ColourOptions
+from .models import ColourOptions as ColorOptions
+from .models import User, large_widget, small_widget
