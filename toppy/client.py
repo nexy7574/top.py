@@ -1,20 +1,22 @@
 import logging
 from json import dumps
-from typing import Union, List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import aiohttp
 import discord
-
 # noinspection PyPep8Naming
 from discord.ext.tasks import loop
 
-from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
-from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
+from .errors import (Forbidden, NotFound, Ratelimited, TopGGServerError,
+                     ToppyError)
+from .models import Bot, BotSearchResults, BotStats, SimpleUser, User
 from .ratelimiter import routes
 
 if TYPE_CHECKING:
-    from discord import Client as _Client, AutoShardedClient as _AutoClient
-    from discord.ext.commands import Bot as _Bot, AutoShardedBot as _AutoBot
+    from discord import AutoShardedClient as _AutoClient
+    from discord import Client as _Client
+    from discord.ext.commands import AutoShardedBot as _AutoBot
+    from discord.ext.commands import Bot as _Bot
 
     bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
 

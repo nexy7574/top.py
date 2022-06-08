@@ -3,7 +3,7 @@ from pathlib import Path
 from re import compile
 from warnings import warn
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 warn(DeprecationWarning("The setup.py install for this project is deprecated."))
 
