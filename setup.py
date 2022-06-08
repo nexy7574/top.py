@@ -5,9 +5,7 @@ from warnings import warn
 
 from setuptools import setup, find_packages
 
-warn(
-    DeprecationWarning("The setup.py install for this project is deprecated.")
-)
+warn(DeprecationWarning("The setup.py install for this project is deprecated."))
 
 chdir(Path(__file__).parent)
 

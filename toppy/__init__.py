@@ -1,4 +1,5 @@
 from sys import version_info as python_version_info
+
 try:
     from discord import version_info as discord_version_info
 except ImportError as e:

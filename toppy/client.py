@@ -4,6 +4,7 @@ from typing import Union, List, Optional, TYPE_CHECKING
 
 import aiohttp
 import discord
+
 # noinspection PyPep8Naming
 from discord.ext.tasks import loop
 
@@ -14,6 +15,7 @@ from .ratelimiter import routes
 if TYPE_CHECKING:
     from discord import Client as _Client, AutoShardedClient as _AutoClient
     from discord.ext.commands import Bot as _Bot, AutoShardedBot as _AutoBot
+
     bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
 
 __version__ = "1.3.1"
