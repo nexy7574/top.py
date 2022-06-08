@@ -1,18 +1,20 @@
 import logging
 from json import dumps
-from typing import Union, List, Optional
+from typing import Union, List, Optional, TYPE_CHECKING
 
 import aiohttp
 import discord
 # noinspection PyPep8Naming
-from discord import Client as C, AutoShardedClient as AC
-# noinspection PyPep8Naming
-from discord.ext.commands import Bot as B, AutoShardedBot as AB
 from discord.ext.tasks import loop
 
 from .errors import ToppyError, Forbidden, TopGGServerError, Ratelimited, NotFound
 from .models import Bot, SimpleUser, BotStats, User, BotSearchResults
 from .ratelimiter import routes
+
+if TYPE_CHECKING:
+    from discord import Client as _Client, AutoShardedClient as _AutoClient
+    from discord.ext.commands import Bot as _Bot, AutoShardedBot as _AutoBot
+    bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
 
 __version__ = "1.3.1"
 __api_version__ = "v0"
@@ -28,7 +30,7 @@ class TopGG:
     class.
     """
 
-    def __init__(self, bot: Union[C, B, AC, AB], *, token: str, autopost: bool = True):
+    def __init__(self, bot: "bot_types", *, token: str, autopost: bool = True):
         r"""
         Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
 
@@ -153,7 +155,7 @@ class TopGG:
                 routes["*"].add_hit()
 
             if "application/json" not in response.headers.get("content-type", "none").lower():
-                logger.warning(f"Got unexpected mime type {response.headers['Content-Type']} from top.gg.")
+                logger.warning(f"Got unexpected content type {response.headers['Content-Type']!r} from top.gg.")
                 raise ToppyError("Unexpected response from server.")
             if response.status in [403, 401]:
                 raise Forbidden()
