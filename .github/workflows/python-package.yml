@@ -26,10 +26,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade wheel pip pycodestyle pytest discord.py>=1.7
+        python -m pip install --upgrade wheel pip pycodestyle pytest discord.py>=1.7 pytest-asyncio
     - name: Lint with pycodestyle
       run: |
-        pycodestyle ./toppy --max-line-length 120
+        pycodestyle ./toppy --max-line-length 130
     - name: Test with pytest
       run: |
         pytest

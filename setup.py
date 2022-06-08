@@ -6,13 +6,11 @@ from warnings import warn
 from setuptools import find_packages
 from setuptools import setup
 
-warn(
-    DeprecationWarning("The setup.py install for this project is deprecated."))
+warn(DeprecationWarning("The setup.py install for this project is deprecated."))
 
 chdir(Path(__file__).parent)
 
-version_regex = compile(
-    r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)((a|b|(r)?c)[0-9]+)?\"")
+version_regex = compile(r"__version__ = \"(?P<v>\d\.\d{1,2}\.\d+)((a|b|(r)?c)\d+)?\"")
 
 reqs = []
 

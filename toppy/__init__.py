@@ -3,8 +3,7 @@ from sys import version_info as python_version_info
 try:
     from discord import version_info as discord_version_info
 except ImportError as e:
-    raise ImportError(
-        "A module with the 'discord' namespace is not installed.") from e
+    raise ImportError("A module with the 'discord' namespace is not installed.") from e
 from warnings import warn
 
 if python_version_info <= (3, 6, 0) and discord_version_info >= (1, 8, 0):
