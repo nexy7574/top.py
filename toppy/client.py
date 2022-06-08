@@ -112,12 +112,12 @@ class TopGG:
         if not self.session:
             self._session = aiohttp.ClientSession(
                 headers={
-                    "User-Agent": f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
+                    "User-Agent":
+                    f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
                     "Authorization": self.token,
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                }
-            )
+                })
         return
 
     @loop(minutes=30)
@@ -140,13 +140,14 @@ class TopGG:
         if "/bots/" in uri:
             rlc = routes["/bots/*"]
             if rlc.ratelimited:
-                logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
+                logger.warning(
+                    f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*."
+                )
                 raise Ratelimited(rlc.retry_after, internal=True)
         if routes["*"].ratelimited:
             logger.warning(
                 f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
-                f" Perhaps review how many requests you're sending?"
-            )
+                f" Perhaps review how many requests you're sending?")
             raise Ratelimited(routes["*"].retry_after, internal=True)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
@@ -168,13 +169,18 @@ class TopGG:
                     routes["/bots/*"].add_hit()
                 routes["*"].add_hit()
 
-            if "application/json" not in response.headers.get("content-type", "none").lower():
-                logger.warning(f"Got unexpected content type {response.headers['Content-Type']!r} from top.gg.")
+            if "application/json" not in response.headers.get(
+                    "content-type", "none").lower():
+                logger.warning(
+                    f"Got unexpected content type {response.headers['Content-Type']!r} from top.gg."
+                )
                 raise ToppyError("Unexpected response from server.")
             if response.status in [403, 401]:
                 raise Forbidden()
             if response.status == 429:
-                logging.warning("Unexpected ratelimit. Re-syncing internal ratelimit handler.")
+                logging.warning(
+                    "Unexpected ratelimit. Re-syncing internal ratelimit handler."
+                )
                 data = await response.json()
                 if "/bots/" in uri:
                     routes["/bots/*"].sync_from_ratelimit(data["retry-after"])
@@ -189,15 +195,21 @@ class TopGG:
             if response.status == 404:
                 raise NotFound()
             if response.status not in expected_codes:
-                raise ToppyError("Unexpected status code '{}'".format(str(response.status)))
+                raise ToppyError("Unexpected status code '{}'".format(
+                    str(response.status)))
 
             data = await response.json()
             # inject metadata
             if isinstance(data, dict):
-                data["_toppy_meta"] = {"headers": response.headers, "status": response.status}
+                data["_toppy_meta"] = {
+                    "headers": response.headers,
+                    "status": response.status
+                }
         return data
 
-    async def fetch_bot(self, bot: Union[discord.User, discord.Member, discord.Object]) -> Bot:
+    async def fetch_bot(
+            self, bot: Union[discord.User, discord.Member,
+                             discord.Object]) -> Bot:
         r"""
         Fetches a bot from top.gg
 
@@ -215,9 +227,11 @@ class TopGG:
         logger.debug(f"Response from fetch_bot: {response}")
         return Bot(**response)
 
-    async def fetch_bots(
-        self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None
-    ) -> BotSearchResults:
+    async def fetch_bots(self,
+                         limit: int = 50,
+                         offset: int = 0,
+                         search: dict = None,
+                         sort: str = None) -> BotSearchResults:
         r"""
         Fetches up to ``limit`` bots from top.gg
 
@@ -289,7 +303,9 @@ class TopGG:
         :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         if limit > 30_000:
-            raise ValueError("Cannot process more than 30 thousand bots at once (definite ratelimit)")
+            raise ValueError(
+                "Cannot process more than 30 thousand bots at once (definite ratelimit)"
+            )
         results = {}
         remaining = limit
         for i in range(0, limit, 500):
@@ -310,12 +326,15 @@ class TopGG:
         """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
-        raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes")
+        raw_users = await self._request("GET",
+                                        f"/bots/{self.bot.user.id}/votes")
         resolved = list(map(lambda u: SimpleUser(**u), raw_users))
         logger.debug(f"Response from fetching votes: {resolved}")
         return resolved
 
-    async def upvote_check(self, user: Union[discord.User, discord.Member, discord.Object]) -> bool:
+    async def upvote_check(
+            self, user: Union[discord.User, discord.Member,
+                              discord.Object]) -> bool:
         r"""
         Checks to see if the provided user has voted for your bot in the pas 12 hours.
 
@@ -333,7 +352,9 @@ class TopGG:
         # Ah yes, three pieces of recycled code. How cool.
         return raw_users["voted"] == 1
 
-    async def get_stats(self, bot: Union[discord.User, discord.Member, discord.Object]) -> BotStats:
+    async def get_stats(
+            self, bot: Union[discord.User, discord.Member,
+                             discord.Object]) -> BotStats:
         r"""Fetches the server & shard count for a bot.
 
         NOTE: this does NOT fetch votes. Use the fetch_bot function for that.
@@ -362,14 +383,19 @@ class TopGG:
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         stats = {"server_count": len(self.bot.guilds)}
-        if (hasattr(self.bot, "shards") and self.bot.shards) or force_shard_count is True:
+        if (hasattr(self.bot, "shards")
+                and self.bot.shards) or force_shard_count is True:
             shards = []
             for shard in self.bot.shards.values():
-                shards.append(len([x for x in self.bot.guilds if x.shard_id == shard.id]))
+                shards.append(
+                    len([x for x in self.bot.guilds
+                         if x.shard_id == shard.id]))
             stats["shards"] = shards
             stats["shard_count"] = max(self.bot.shard_count, 1)
 
-        response = await self._request("POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats))
+        response = await self._request("POST",
+                                       f"/bots/{self.bot.user.id}/stats",
+                                       data=dumps(stats))
         logger.debug(f"Response from fetching posting stats: {response}")
         self.bot.dispatch("guild_post", stats)
         return stats["server_count"]
@@ -384,7 +410,9 @@ class TopGG:
         data = await self._request("GET", f"/weekend")
         return data["is_weekend"]
 
-    async def fetch_user(self, user: Union[discord.User, discord.Member, discord.Object]) -> User:
+    async def fetch_user(
+            self, user: Union[discord.User, discord.Member,
+                              discord.Object]) -> User:
         """
         Fetches a user's profile from top.gg.
 
