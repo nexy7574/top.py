@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 from typing import Dict
 
 
@@ -59,6 +60,6 @@ class Ratelimit:
 
 
 _routes: Dict[str, Ratelimit] = {
-    "*": Ratelimit(route="*", hits=100, cooldown=3600),
     "/bots/*": Ratelimit(route="/bots/*", hits=60, cooldown=3600),
+    "*": Ratelimit(route="*", hits=100, cooldown=3600),
 }

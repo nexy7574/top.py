@@ -8,8 +8,5 @@ def test_import_server():
 
 def test_init_client():
     from toppy.client import TopGG
-    TopGG(
-        None,
-        token="hi",
-        autopost=False
-    )
+
+    TopGG(None, token="hi", autopost=False)
