@@ -6,6 +6,12 @@
 Welcome to top.py's documentation!
 ==================================
 
+.. danger::
+   top.py's package name will soon be changed to top.gg.py to avoid confusion
+   and conflicts while packaging.
+
+   *The namespace ``toppy`` will remain the same*
+
 toppy version:
 
 .. toctree::
