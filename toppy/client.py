@@ -1,4 +1,5 @@
 import logging
+import warnings
 from json import dumps
 from typing import List
 from typing import Optional
@@ -31,9 +32,7 @@ if TYPE_CHECKING:
 
     bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
 
-__version__ = "1.3.1"
-__api_version__ = "v0"
-_base_ = "https://top.gg/api"
+__version__ = "1.3.2"
 logger = logging.getLogger(__name__)
 
 
@@ -44,6 +43,8 @@ class TopGG:
     This class handles everything for the top.gg API, APART FROM voting webhooks - Those are handled by the server
     class.
     """
+    __api_version__ = "v0"
+    _base_ = "https://top.gg/api"
 
     def __init__(self, bot: "bot_types", *, token: str, autopost: bool = True):
         r"""
@@ -71,6 +72,15 @@ class TopGG:
         self.vote_check = self.upvote_check
         self.has_upvoted = self.upvote_check
         self.get_user_vote = self.upvote_check
+
+    def _change_api_version(self, v: int):
+        # You shouldn't use this unless v1 is released, and you MUST use it before the package catches up.
+        # If you change the API version then there is no guarantee that literally anything will work.
+        warnings.warn(UserWarning("You changed the API version. functionality is not a guarantee."))
+        # I actually have no idea how they'll handle the API version change, so we're just gonna
+        # append the version string
+        self.__api_version__ = "v" + str(v)
+        self._base_ += self.__api_version__
 
     def __del__(self):
         r"""Lower-level garbage collection function fired when the variable is discarded, performs cleanup."""
@@ -113,7 +123,7 @@ class TopGG:
         if not self.session:
             self._session = aiohttp.ClientSession(
                 headers={
-                    "User-Agent": f"top.py (version {__version__}, https://github.com/dragdev-studios/top.py)",
+                    "User-Agent": f"top.py (version {__version__}, https://github.com/EEKIM10/top.py)",
                     "Authorization": self.token,
                     "Content-Type": "application/json",
                     "Accept": "application/json",
@@ -154,7 +164,7 @@ class TopGG:
             kwargs["data"] = dumps(kwargs["data"])
 
         expected_codes = kwargs.pop("expected_codes", [200])
-        url = _base_ + uri
+        url = self._base_ + uri
         await self._wf_s()
 
         logger.info('Sending "{} {}"...'.format(method, url))
