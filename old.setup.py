@@ -23,7 +23,7 @@ with open("./toppy/client.py", encoding="utf-8") as client:
     assert version is not None
 
 setup(
-    name="top.py",
+    name="top.gg.py",
     version=version,
     packages=find_packages("tests"),
     url="https://github.com/dragdev-studios/top.py",
@@ -38,6 +38,7 @@ setup(
     extras_require={
         "tests": ["pytest", "flask", "requests"],
         "docs": ["sphinx", "sphinx-rtd-dark-mode"],
+        "dev": ["pytest", "build", "black", "pycodestyle", "twine"]
     },
     python_requires=">=3.6",
     classifiers=[
