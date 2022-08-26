@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
     bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
 
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 logger = logging.getLogger(__name__)
 
 
