@@ -24,4 +24,4 @@ Example:
     bot.run("...")
     bot.webhook_server.cancel()  # closes the server. Not really needed when the program is quitting, but oh well.
 
-.. autofunc:: create_server
+.. function:: create_server
