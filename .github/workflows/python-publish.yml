@@ -28,4 +28,4 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python -m build
-        twine upload dist/* --skip-existing -C "This version was automatically created when a new release was made on github."
+        twine upload dist/* --skip-existing
