@@ -1,5 +1,5 @@
 import asyncio
-from typing import Union, Literal
+from typing import Union
 
 import discord
 from aiohttp.web import Response
