@@ -1,6 +1,12 @@
+import asyncio
 import logging
 from aiohttp import web
-from .models import Vote
+from .models import cast_vote
+
+
+__all__ = (
+    "create_server",
+)
 
 
 def _create_callback(bot, auth, *, disable_warnings: bool = False):
@@ -13,8 +19,9 @@ def _create_callback(bot, auth, *, disable_warnings: bool = False):
                     logging.warning("Got incorrect authorisation from '{}': {}".format(request.remote, user_auth))
                 return web.Response(body='{"detail": "unauthorized."}', status=401)
         try:
-            vote = Vote(await request.json())
-        except TypeError:
+            data = await request.json()
+            vote = cast_vote(data, bot)
+        except (TypeError, ValueError, KeyError):
             return web.Response(body='{"detail": "malformed body."}', status=422)
         bot.dispatch("vote", vote)
         return web.Response(body='{"detail": "accepted"}')
@@ -24,7 +31,7 @@ def _create_callback(bot, auth, *, disable_warnings: bool = False):
 
 async def create_server(
     bot, *, host: str = "0.0.0.0", port: int = 8080, path: str = "/", auth: str = None, disable_warnings: bool = False
-):
+) -> asyncio.Task:
     """
     Creates a vote webhook server.
 

@@ -11,15 +11,16 @@ This page will describe top.py's client class and it's attributes.
 
 Version
 ~~~~~~~
-You can get a version from :obj:`toppy.client.__version__`
+You can get a version from :attr:`toppy.__version__`
 
 Client
 ~~~~~~
 .. autoclass:: TopGG
     :members:
+    :undoc-members:
 
-Event Reference
-~~~~~~~~~~~~~~~
+Client Event Reference
+~~~~~~~~~~~~~~~~~~~~~~
 
 _Note: all events must be async._
 
@@ -71,7 +72,7 @@ _Note: all events must be async._
         async def on_toppy_request(self, *, url, method):
             print(f"[{datetime.datetime.now().strftime('%c')}] {method} {url}")
 
-.. function:: on_topp_stat_autopost(result):
+.. function:: on_toppy_stat_autopost(result):
 
     Event dispatched whenever the internal autopost task succeeds.
 

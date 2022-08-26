@@ -1,8 +1,14 @@
 import asyncio
+from typing import Union, Literal
+
+import discord
 from aiohttp.web import Response
 import pytest
 
-from toppy.server import _create_callback, Vote
+from toppy.server import _create_callback, cast_vote
+from toppy.models import VoteType, BotVote, ServerVote
+
+Vote = Union[BotVote, ServerVote]
 
 pytest_plugins = ("pytest_asyncio",)
 
@@ -20,9 +26,12 @@ class Sponge:
     def dispatch(self, _, vp: Vote):
         assert vp.bot.id == int(POST_DATA["bot"])
         assert vp.user.id == int(POST_DATA["user"])
-        assert vp.is_test is True
+        assert vp.type == VoteType.TEST
         assert vp.is_weekend is False
         assert vp.query == POST_DATA["query"]
+
+    def get_user(self, _id):
+        return discord.Object(_id)
 
 
 class FakeRequest:
@@ -65,3 +74,32 @@ async def test_vote_server_broken_data():
         _data[key] = None
     response: Response = await cb(FakeRequest(_data))
     assert response.status == 422
+
+
+@pytest.mark.parametrize(
+    ("data", "expected_type"),
+    (
+            (
+                {
+                    "guild": "729779146682793984",
+                    "user": "421698654189912064",
+                    "type": "test",
+                    "query": ""
+                },
+                ServerVote
+            ),
+            (
+                {
+                    "bot": "729335748670783488",
+                    "user": "421698654189912064",
+                    "type": "test",
+                    "isWeekend": False,
+                    "query": ""
+                },
+                BotVote
+            )
+    )
+)
+def test_vote_cast(data: dict, expected_type: type):
+    casted = cast_vote(data)
+    assert isinstance(casted, expected_type)

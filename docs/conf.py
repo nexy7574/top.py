@@ -28,8 +28,8 @@ with open("../toppy/client.py") as client:
 # -- Project information -----------------------------------------------------
 
 project = "top.py"
-copyright = "2021, DragDev Studios"
-author = "DragDev Studios"
+copyright = "2022, EEKIM10"
+author = "EEKIM10"
 version = __version__
 
 # -- General configuration ---------------------------------------------------
@@ -49,7 +49,7 @@ intersphinx_mapping = {
     "http": ("https://docs.aiohttp.org/en/stable/", None),
 }
 extlinks = {
-    "issue": ("https://github.com/dragdev-studios/top.py/issues/%s", "GH-"),
+    "issue": ("https://github.com/EEKIM10/top.py/issues/%s", "GH-"),
 }
 autodoc_member_order = "bysource"
 

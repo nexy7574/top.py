@@ -16,7 +16,5 @@ if python_version_info <= (3, 6, 0) and discord_version_info >= (1, 8, 0):
 from .client import TopGG
 from .client import TopGG as Client
 from .client import TopGG as DBLClient
-from .models import Bot
-from .models import ColourOptions
-from .models import ColourOptions as ColorOptions
-from .models import User, large_widget, small_widget
+from .models import *
+from .server import *

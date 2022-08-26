@@ -1,3 +1,11 @@
+__all__ = (
+    "ColourOptions",
+    "ColorOptions",
+    "large_widget",
+    "small_widget"
+)
+
+
 def _international(n, d) -> str:
     return d.get(n + "colour") or d.get(n + "color") or ""
 
@@ -77,6 +85,9 @@ class ColourOptions(dict):
         if key == "small":
             return any(bool(getattr(self, x)) for x in self.SMALL_ONLY)
         return any(bool(getattr(self, x)) for x in self.LARGE_ONLY)
+
+
+ColorOptions = ColourOptions
 
 
 # noinspection PyShadowingBuiltins

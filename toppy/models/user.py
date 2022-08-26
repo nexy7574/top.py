@@ -8,6 +8,17 @@ from discord.colour import Colour
 from discord.utils import oauth_url as invite
 
 
+__all__ = (
+    "UserABC",
+    "SimpleUser",
+    "Socials",
+    "User",
+    "Bot",
+    "BotSearchResults",
+    "BotStats"
+)
+
+
 class _ReprMixin(object):
     """Mixin that provides every model with a humanized repr() string."""
 
@@ -172,7 +183,7 @@ class User(UserABC, _ReprMixin):
 
         If the user doesn't have an avatar, this will return their default one."""
         if self._avatar:
-            return calculate_avatar_url(self.id, self.discriminator, self._avatar)
+            return calculate_avatar_url(self.id, int(self.discriminator), self._avatar)
         return default_avatar_url(int(self.discriminator))
 
     @property

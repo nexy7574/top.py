@@ -42,6 +42,13 @@ class TopGG:
 
     This class handles everything for the top.gg API, APART FROM voting webhooks - Those are handled by the server
     class.
+
+    Attributes:
+        bot: Union[:class:`discord:discord.Client`, :class:`discord:discord.ext.commands.Bot`]
+            The bot that this instance is running under. Can be any instance of bot, not just the ones listed.
+
+        token: :class:`py:str`
+            The token you use for top.gg's API
     """
     __api_version__ = "v0"
     _base_ = "https://top.gg/api"
