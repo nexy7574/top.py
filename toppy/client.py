@@ -322,7 +322,7 @@ class TopGG:
         Fetches the last 1000 voters for your bot.
 
         :returns: A list of up to 1000 SimpleUser objects who have voted for your bot in the past (any time period).
-        :rtype: :class:`py:list`[:class:`toppy.models.SimpleUser`]
+        :rtype: :class:`py:list` [:class:`toppy.models.SimpleUser`]
         :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
         :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
