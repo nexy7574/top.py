@@ -32,7 +32,14 @@ if TYPE_CHECKING:
 
     bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
 
-__version__ = "1.4.2"
+__version__ = "1.4.3a1"
+
+try:
+    import pep440
+    pep440.assert_valid(__version__)
+except ImportError:
+    pass
+
 logger = logging.getLogger(__name__)
 
 
