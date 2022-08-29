@@ -29,7 +29,8 @@ def _create_callback(bot, auth, *, disable_warnings: bool = False, verbose: bool
             if verbose:
                 print(f"Data from {request.remote}: {data}")
             vote = cast_vote(data, bot)
-        except (TypeError, ValueError, KeyError):
+        except (TypeError, ValueError, KeyError) as e:
+            print(f"Malformed data from {request.remote}: {await request.text()} - {e}")
             return web.Response(body='{"detail": "malformed body."}', status=422)
         if verbose:
             print(f"Dispatched {vote} to on_vote.")
@@ -73,7 +74,7 @@ def start_server(
         await runner.setup()
         webserver = web.TCPSite(runner, host, port)
         if verbose:
-            print(f"Starting top.gg webhook server on {host}:{port}/{path}.")
+            print(f"Starting top.gg webhook server on {host}:{port}{path}.")
         await webserver.start()
 
     return inner()

@@ -76,7 +76,7 @@ class ServerVote(SharedVote, _ReprMixin):
             state,
             data["user"],
             data["type"],
-            data["query"]
+            data.get("query", "")
         )
         self._guild = data["guild"]
 
@@ -124,10 +124,10 @@ class BotVote(SharedVote, _ReprMixin):
             state,
             data["user"],
             data["type"],
-            data["query"]
+            data.get("query", "")
         )
         self._bot = data["bot"]
-        self.is_weekend: bool = data["isWeekend"]
+        self.is_weekend: bool = data.get("isWeekend", False)
         self.isWeekend = self.is_weekend  # alias
 
     @property
