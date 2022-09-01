@@ -1,4 +1,5 @@
 import asyncio
+import json
 from typing import Union
 
 import discord
@@ -45,6 +46,9 @@ class FakeRequest:
 
     async def json(self):
         return self.data
+
+    async def text(self):
+        return json.dumps(self.data)
 
 
 @pytest.mark.asyncio

@@ -26,6 +26,10 @@ class Ratelimit:
         Boolean indicating if the current route is ratelimited.
         :return: True if a request would become ratelimited, otherwise False.
         """
+        now = datetime.utcnow()
+        if self.hits >= self.max_hits and now > self.expires:
+            self.hits = 0
+            self.expires = datetime.min
         return self.hits >= self.max_hits and datetime.utcnow() <= self.expires
 
     @property
