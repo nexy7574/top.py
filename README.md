@@ -1,4 +1,21 @@
-# Top.py
+# This project is now retired
+
+I do not work on discord bots anymore, and consequently do not use top.gg anymore.
+
+This package should continue to work with v0 of the top.gg API, however will not work with v1 or any newer versions,
+assuming they are breaking changes to the API.
+
+You are welcome to fork and continue developing this code should you wish, however, for a project that is guaranteed
+to continue being developed well into the future, I recommend you use the
+[official python SDK.](//github.com/top-gg/python-sdk).
+
+*I am, however, now creating bots on [matrix](//matrix.org), and even have my own [bot library](https://pypi.org/project/nio-bot)!*
+
+This repository is indefinitely archived.
+
+---
+
+## Top.py
 
 ![issues: unresolved](https://img.shields.io/github/issues/dragdev-studios/top.py?style=for-the-badge)
 ![pull requests: unresolved](https://img.shields.io/github/issues-pr/dragdev-studios/top.py?style=for-the-badge)
@@ -14,7 +31,7 @@ _Please note, this is **not an official package from top.gg**. We are not
 affiliated with top.gg in any way. If you want to install their official
 package, please see [their repo](//github.com/top-gg/python-sdk)._
 
-## Introduction
+### Introduction
 
 > Warning! top.py is not tested to be compatible with discord.py forks, or any other library than the official 
 > discord.py library. If you encounter issues when using another library, please open an issue with as much detail
@@ -24,7 +41,7 @@ top.py is a python wrapper for the top.gg discord bot list API. top.py aims to
 be object-oriented, whereas the official top.gg python SDK is more low-level raw
 data.
 
-### Installation
+#### Installation
 
 You can install the latest stable release here:
 
@@ -35,11 +52,11 @@ pip install top.py
 But, if you're reading this, you're most likely a developer - you should know
 how to install packages by now.
 
-### Examples
+#### Examples
+
 You can see examples in the [examples.md](https://github.com/dragdev-studios/top.py/blob/master/examples.md) file.
 
-### Supported Features
-
+#### Supported Features
 <!-- Note to contributors: Use these emojis below 
 <!-- ✅ ❌ -->
 
@@ -61,13 +78,12 @@ You can see examples in the [examples.md](https://github.com/dragdev-studios/top
 **NOTE:** We do **NOT** currently provide official support for discord server
 list. That's coming soon.
 
-### top.py features:
+#### top.py features
 
 * Object-Oriented (No-more shall you faff about with dictionaries)
 * Sensible function names & arguments
-* 
 
-## Useful links
+### Useful links
 
 [support](//discord.gg/YBNWw7nMGH) (or mention @eek#7574 in top.gg) |
 [docs](//toppy.dragdev.xyz) | [PyPi](//pypi.org/project/top.py) |
