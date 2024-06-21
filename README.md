@@ -1,20 +1,3 @@
-# This project is now retired
-
-I do not work on discord bots anymore, and consequently do not use top.gg anymore.
-
-This package should continue to work with v0 of the top.gg API, however will not work with v1 or any newer versions,
-assuming they are breaking changes to the API.
-
-You are welcome to fork and continue developing this code should you wish, however, for a project that is guaranteed
-to continue being developed well into the future, I recommend you use the
-[official python SDK.](//github.com/top-gg/python-sdk).
-
-*I am, however, now creating bots on [matrix](//matrix.org), and even have my own [bot library](https://pypi.org/project/nio-bot)!*
-
-This repository is indefinitely archived.
-
----
-
 ## Top.py
 
 ![issues: unresolved](https://img.shields.io/github/issues/dragdev-studios/top.py?style=for-the-badge)
