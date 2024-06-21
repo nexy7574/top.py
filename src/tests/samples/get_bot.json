@@ -1,0 +1,49 @@
+{
+  "defAvatar": "322c936a8c8be1b803cd94861bdfa868",
+  "invite": "https://discordapp.com/oauth2/authorize?client_id=235148962103951360&scope=bot&permissions=2088234238",
+  "website": "https://carl.gg/",
+  "support": "DSg744v",
+  "github": null,
+  "longdesc": "# Meet Carlbot\n\n\n\n<img src=\"https://i.imgur.com/qcc7H0V.png\">\n\n\n# Want to support the dev and learn more?\n\n<center>\n|               Check Out:                                               | \n|:------------------------------------------------------------------:|\n| <a href=\"https://www.patreon.com/carlbot\">[Patreon]</a>                         | \n| <a href=\"https://discord.gg/DSg744v\">[Carlbot Help Server]</a>                  | \n| <a href=\"https://carl.gg/\">[Carlbot Dashboard]</a>                             |\n| <a href=\"https://docs.carl.gg/\">[Commands]</a>                                  |\n| <a href=\"https://discordbots.org/bot/235148962103951360\">[Discord Bot List]</a> |\n| <a href=\"https://trello.com/b/Uj8DKydw/carl-bot\">[Trello]</a>                   |\n</center>\n\n\n\n\n\n",
+  "shortdesc": "Custom commands, reaction role assignment, twitch, starboard, polls, levels, moderation, logging, timers, announcements, Dashboard",
+  "prefix": "custom (? and ! by default)",
+  "lib": "discord.py",
+  "clientid": "235148962103951360",
+  "avatar": "ed3dac3b6e7a851df781632a4295fcb9",
+  "id": "235148962103951360",
+  "discriminator": "1536",
+  "username": "Carl-bot",
+  "date": "2018-02-15T17:25:12.552Z",
+  "server_count": 3395239,
+  "shard_count": null,
+  "guilds": [
+    "898685507142316093",
+    "727649662475173962",
+    "349051257702580224",
+    "697834746734051358",
+    "469229972641284097",
+    "550389429567750155",
+    "306276944780066819",
+    "715121965563772980",
+    "657255532905627649",
+    "679765534950424601"
+  ],
+  "shards": null,
+  "monthlyPoints": 481,
+  "points": 157911,
+  "certifiedBot": false,
+  "owners": [
+    "519828214005104640"
+  ],
+  "tags": [
+    "customizable-behavior",
+    "fortnite",
+    "logging",
+    "moderation",
+    "role-management",
+    "utility",
+    "web-dashboard"
+  ],
+  "bannerUrl": null,
+  "donatebotguildid": null
+}

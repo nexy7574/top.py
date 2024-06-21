@@ -1,10 +1,10 @@
-from argparse import ArgumentParser
-import sys
-import platform
-from re import compile
-from subprocess import run, PIPE, DEVNULL
 import datetime
+import platform
+import sys
+from argparse import ArgumentParser
 from pathlib import Path
+from re import compile
+from subprocess import DEVNULL, PIPE, run
 
 parser = ArgumentParser()
 

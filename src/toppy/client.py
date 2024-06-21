@@ -1,78 +1,89 @@
 import logging
 import warnings
 from json import dumps
-from typing import List
-from typing import Optional
-from typing import TYPE_CHECKING
-from typing import Union
+from typing import TYPE_CHECKING, List, Optional, Union
+from importlib.metadata import version
 
 import aiohttp
 import discord
 from discord.ext.tasks import loop
 
-from .errors import Forbidden
-from .errors import NotFound
-from .errors import Ratelimited
-from .errors import TopGGServerError
-from .errors import ToppyError
-from .models import Bot
-from .models import BotSearchResults
-from .models import BotStats
-from .models import SimpleUser
-from .models import User
-from .ratelimiter import routes
+from .errors import Forbidden, NotFound, Ratelimited, TopGGServerError, ToppyError
+from .ratelimiter import Ratelimit
+from .models import (
+    Bot,
+    BotSearchResult,
+    Last1000VotesResponse,
+    VoteResult,
+    IndividualUserVoteResult,
+    BotStatsResult,
+    BotStatsPayload,
+    User
+)
 
 # noinspection PyPep8Naming
 
 if TYPE_CHECKING:
-    from discord import AutoShardedClient as _AutoClient
-    from discord import Client as _Client
-    from discord.ext.commands import AutoShardedBot as _AutoBot
-    from discord.ext.commands import Bot as _Bot
-
-    bot_types = Union[_Client, _AutoClient, _Bot, _AutoBot]
-
-__version__ = "1.4.3a3"
-
-try:
-    import pep440
-    pep440.assert_valid(__version__)
-except ImportError:
-    pass
+    from discord import Client as DiscordClient
 
 logger = logging.getLogger(__name__)
 
+__VERSION__ = version("top.py")
+
+
+class BulkFetchBotsIterator:
+    def __init__(
+            self,
+            limit: int = 50,
+            offset: int = 0,
+            search: dict = None,
+            sort: str = None,
+            *,
+            state: "TopGG"
+    ):
+        self.limit = limit
+        self.offset = offset
+        self.search = search
+        self.sort = sort
+        self._state = state
+
+    def __aiter__(self) -> "BulkFetchBotsIterator":
+        return self
+
+    async def __anext__(self) -> BotSearchResult:
+        if not self._state.session:
+            raise StopAsyncIteration("Session not initialized.")
+        r = await self._state.fetch_bots(
+            limit=self.limit,
+            offset=self.offset,
+            search=self.search,
+            sort=self.sort
+        )
+        if r.count == 0:
+            raise StopAsyncIteration
+        self.offset += r.count
+        return r
+
+    async def flatten(self) -> BotSearchResult:
+        r"""Flattens the iterator into a single BotSearchResult."""
+        results = []
+        async for x in self:
+            x: BotSearchResult
+            results.extend(x.results)
+        return BotSearchResult(*results, limit=self.limit, offset=self.offset, count=len(results), total=len(results))
+
 
 class TopGG:
-    r"""
+    """
     The client class for the top.gg API.
 
     This class handles everything for the top.gg API, APART FROM voting webhooks - Those are handled by the server
     class.
-
-    Attributes:
-        bot: Union[:class:`discord:discord.Client`, :class:`discord:discord.ext.commands.Bot`]
-            The bot that this instance is running under. Can be any instance of bot, not just the ones listed.
-
-        token: :class:`py:str`
-            The token you use for top.gg's API
     """
     __api_version__ = "v0"
     _base_ = "https://top.gg/api"
 
-    def __init__(self, bot: "bot_types", *, token: str, autopost: bool = True):
-        r"""
-        Initialises an instance of the top.gg client. Please don't call this multiple times, it WILL break stuff.
-
-        Parameters
-        ----------
-        bot: :obj:`discord.Client`
-            The bot instance to use. Can be client or bot, and their auto-sharded equivalents.
-        token: :obj:`py:str`
-            Your bot's API token from top.gg.
-        autopost: :obj:`py:bool`
-            Whether to automatically post server count every 30 minutes or not.
-        """
+    def __init__(self, bot: "DiscordClient", *, token: str, autopost: bool = True):
         self.bot = bot
         self.token = token
         self.ratelimit_persistence = True
@@ -86,6 +97,11 @@ class TopGG:
         self.vote_check = self.upvote_check
         self.has_upvoted = self.upvote_check
         self.get_user_vote = self.upvote_check
+
+        self.ratelimits = {
+            "/bots/*": Ratelimit(route="/bots/*", max_hits=60, per=60, cooldown=3600),
+            "*": Ratelimit(route="*", max_hits=120, per=60, cooldown=3600)
+        }
 
     def _change_api_version(self, v: int):
         # You shouldn't use this unless v1 is released, and you MUST use it before the package catches up.
@@ -137,7 +153,7 @@ class TopGG:
         if not self.session:
             self._session = aiohttp.ClientSession(
                 headers={
-                    "User-Agent": f"top.py (version {__version__}, https://github.com/EEKIM10/top.py)",
+                    "User-Agent": f"top.py (version {__VERSION__}, https://github.com/nexy7574/top.py)",
                     "Authorization": self.token,
                     "Content-Type": "application/json",
                     "Accept": "application/json",
@@ -154,25 +170,18 @@ class TopGG:
         self.bot.dispatch("toppy_stat_autopost", result)
 
     async def _request(self, method: str, uri: str, **kwargs) -> dict:
-        # Hello fellow code explorer!
-        # Yes, this is the function that single-handedly carries this module
-        # Yes, it's a bit jank
-        # Yes, you're welcome to tidy it up
-        # No, there's no need to change anything
-        # It works perfectly fine
-        # JUST DON'T *TRY* TO BREAK IT
-        # Many thanks, eek
+        logging.warning(f"Requesting {method} {uri} with kwargs {kwargs}")
         if "/bots/" in uri:
-            rlc = routes["/bots/*"]
+            rlc = self.ratelimits["/bots/*"]
             if rlc.ratelimited:
-                logger.warning(f"Ratelimted for {rlc.retry_after*1000}ms. Handled under the bucket /bots/*.")
-                raise Ratelimited(rlc.retry_after, internal=True)
-        if routes["*"].ratelimited:
+                logger.warning(f"Ratelimted for {rlc.retry_after*1000:,}ms. Handled under the bucket /bots/*.")
+                raise Ratelimited(rlc.retry_after, limiter=rlc, internal=True)
+        if self.ratelimits["*"].ratelimited:
             logger.warning(
-                f"Ratelimited for {routes['*'].retry_after*1000}ms. Handled under the bucket /*."
+                f"Ratelimited for {self.ratelimitsself.ratelimits['*'].retry_after*1000:,}ms. Handled under the bucket /*."
                 f" Perhaps review how many requests you're sending?"
             )
-            raise Ratelimited(routes["*"].retry_after, internal=True)
+            raise Ratelimited(self.ratelimits["*"].retry_after, limiter=self.ratelimits["*"], internal=True)
 
         if kwargs.get("data") and isinstance(kwargs["data"], dict):
             kwargs["data"] = dumps(kwargs["data"])
@@ -190,8 +199,8 @@ class TopGG:
                 # NOTE: This has moved from just before the return since the hits count as soon as a response
                 # is generated (unless it's 5xx).
                 if "/bots/" in uri:
-                    routes["/bots/*"].add_hit()
-                routes["*"].add_hit()
+                    self.ratelimits["/bots/*"].add_hit()
+                self.ratelimits["*"].add_hit()
 
             if "application/json" not in response.headers.get("content-type", "none").lower():
                 logger.warning(f"Got unexpected content type {response.headers['Content-Type']!r} from top.gg.")
@@ -202,8 +211,8 @@ class TopGG:
                 logging.warning("Unexpected ratelimit. Re-syncing internal ratelimit handler.")
                 data = await response.json()
                 if "/bots/" in uri:
-                    routes["/bots/*"].sync_from_ratelimit(data["retry-after"])
-                routes["*"].sync_from_ratelimit(data["retry-after"])
+                    self.ratelimits["/bots/*"].sync_from_ratelimit(data["retry-after"])
+                self.ratelimits["*"].sync_from_ratelimit(data["retry-after"])
 
                 # NOTE: This is a bit of a whack way to deal with this.
                 # There should definitely be only one way to handle a ratelimit
@@ -242,7 +251,7 @@ class TopGG:
 
     async def fetch_bots(
         self, limit: int = 50, offset: int = 0, search: dict = None, sort: str = None
-    ) -> BotSearchResults:
+    ) -> BotSearchResult:
         r"""
         Fetches up to ``limit`` bots from top.gg
 
@@ -272,12 +281,18 @@ class TopGG:
         result = await self._request("GET", "/bots")
         logger.debug(f"Response from fetching bots: {result}")
         new_results = []
-        for bot in result["results"]:
+        for bot in result.pop("results"):
             bot["state"] = self.bot
             new_results.append(Bot(**bot))
-        return BotSearchResults(*new_results, limit=limit, offset=offset)
+        return BotSearchResult(results=new_results, **result)
 
-    async def bulk_fetch_bots(self, limit: int = 500, *args) -> dict:
+    def bulk_fetch_bots(
+            self,
+            limit: int = 500,
+            offset: int = 0,
+            search: dict = None,
+            sort: str = None
+    ) -> BulkFetchBotsIterator:
         r"""Similar to fetch_bots, except allows for requesting more than 500 bots at once.
 
         .. warning::
@@ -307,24 +322,15 @@ class TopGG:
         :type offset: :class:`py:int`
         :type search: Optional[:class:`py:dict`]
         :type sort: Optional[:class:`py:str`]
-        :return: The results of your search (up to ``limit`` results)
-        :rtype: :class:`toppy.models.BotSearchResults`
         :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
         :raises toppy.errors.Forbidden: You didn't specify a valid API token, or you are banned from the API.
         :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         if limit > 30_000:
             raise ValueError("Cannot process more than 30 thousand bots at once (definite ratelimit)")
-        results = {}
-        remaining = limit
-        for i in range(0, limit, 500):
-            amount = min(500, remaining)
-            batch_results = await self.fetch_bots(amount, offset=i, *args)
-            remaining -= amount
-            results = {**results, **{x.id: x for x in batch_results}}
-        return results
+        return BulkFetchBotsIterator(limit=limit, offset=offset, search=search, sort=sort, state=self)
 
-    async def fetch_votes(self) -> List[SimpleUser]:
+    async def fetch_votes(self) -> Last1000VotesResponse:
         r"""
         Fetches the last 1000 voters for your bot.
 
@@ -336,29 +342,28 @@ class TopGG:
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         raw_users = await self._request("GET", f"/bots/{self.bot.user.id}/votes")
-        resolved = list(map(lambda u: SimpleUser(**u), raw_users))
-        logger.debug(f"Response from fetching votes: {resolved}")
-        return resolved
+        logger.debug(f"Response from fetching votes: {raw_users}")
+        return [VoteResult(**x) for x in raw_users]
 
-    async def upvote_check(self, user: Union[discord.User, discord.Member, discord.Object]) -> bool:
+    async def upvote_check(self, user: Union[discord.User, discord.Member, discord.Object]) -> IndividualUserVoteResult:
         r"""
         Checks to see if the provided user has voted for your bot in the pas 12 hours.
 
         :param user: The user to fetch upvote for.
         :returns: True if the has user voted in the past 12 hours, False if not
-        :rtype: :class:`py:bool`
+        :rtype: :class:`IndividualUserVoteResult`
         :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
         :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
         if not self.bot.is_ready():
             await self.bot.wait_until_ready()
         uri = f"/bots/{self.bot.user.id}/check?userId={user.id}"
-        raw_users = await self._request("GET", uri)
-        logger.debug(f"Response from fetching upvote check: {raw_users}")
+        raw_result = await self._request("GET", uri)
+        logger.debug(f"Response from fetching upvote check: {raw_result}")
         # Ah yes, three pieces of recycled code. How cool.
-        return raw_users["voted"] == 1
+        return IndividualUserVoteResult(**raw_result)
 
-    async def get_stats(self, bot: Union[discord.User, discord.Member, discord.Object]) -> BotStats:
+    async def get_stats(self, bot: Union[discord.User, discord.Member, discord.Object]) -> BotStatsResult:
         r"""Fetches the server & shard count for a bot.
 
         NOTE: this does NOT fetch votes. Use the fetch_bot function for that.
@@ -366,13 +371,15 @@ class TopGG:
         :returns: Basic statistics on the specified bot.
         :rtype: :class:`toppy.models.BotStats`
         :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
-        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given."""
+        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code
+        was given.
+        """
         uri = f"/bots/{bot.id}/stats"
         raw_stats = await self._request("GET", uri)
         logger.debug(f"Response from fetching stats: {raw_stats}")
-        return BotStats(**raw_stats)
+        return BotStatsResult(**raw_stats)
 
-    async def post_stats(self, force_shard_count: bool = False) -> int:
+    async def post_stats(self, force_shard_count: bool = False) -> BotStatsPayload:
         r"""
         Posts your bot's current statistics to top.gg
 
@@ -380,7 +387,7 @@ class TopGG:
         :param force_shard_count: If true, always include shard data, even when it would normally be excluded
 
         :returns: an integer of how many servers got posted.
-        :rtype: :class:`py:int`
+        :rtype: :class:`BotStatsResult`
         :raises toppy.errors.Ratelimited: You've sent too many requests to the API recently.
         :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given.
         """
@@ -393,21 +400,23 @@ class TopGG:
                 shards.append(len([x for x in self.bot.guilds if x.shard_id == shard.id]))
             stats["shards"] = shards
             stats["shard_count"] = max(self.bot.shard_count, 1)
+            stats["shard_id"] = self.bot.shard_id or 0
 
         response = await self._request("POST", f"/bots/{self.bot.user.id}/stats", data=dumps(stats))
         logger.debug(f"Response from fetching posting stats: {response}")
         self.bot.dispatch("guild_post", stats)
-        return stats["server_count"]
+        return BotStatsPayload(**response)
 
-    async def is_weekend(self) -> bool:
-        r"""Returns True or False, depending on if it's a "weekend".
+    # async def is_weekend(self) -> bool:
+    #     r"""Returns True or False, depending on if it's a "weekend".
+    #
+    #     If it's a weekend, votes count as double.
+    #
+    #     :rtype: :class:`py:bool:`
+    #     data = await self._request("GET", f"/weekend")
+    #     return data["is_weekend"]
 
-        If it's a weekend, votes count as double.
-
-        :rtype: :class:`py:bool:`
-        :raises toppy.errors.ToppyError: Either the server sent an invalid response, or an unexpected response code was given."""
-        data = await self._request("GET", f"/weekend")
-        return data["is_weekend"]
+    # /weekend is no-longer documented(?)
 
     async def fetch_user(self, user: Union[discord.User, discord.Member, discord.Object]) -> User:
         """
@@ -419,4 +428,4 @@ class TopGG:
         :returns toppy.models.User: The fetched user's profile
         """
         data = await self._request("GET", f"/users/{user.id}")
-        return User(**data, state=self.bot)
+        return User(**data)

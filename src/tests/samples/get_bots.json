@@ -1,0 +1,340 @@
+{
+  "results": [
+    {
+      "defAvatar": "6debd47ed13483642cf09e832ed0bc1b",
+      "invite": "https://discordapp.com/oauth2/authorize?permissions=36793344&scope=bot&client_id=266872046921711616",
+      "website": "http://hydra-bot.com",
+      "github": "",
+      "longdesc": "Hydra provides many features from join/leave announcements to music. With active development, you will love Hydra!",
+      "shortdesc": "Hydra is a simple multi functional bot coded in Eris",
+      "prefix": ".",
+      "lib": "Eris",
+      "clientid": "266872046921711616",
+      "avatar": "3250715107ab6d793456e892d8c7b941",
+      "id": "266872046921711616",
+      "discriminator": "0250",
+      "username": "HydraBot",
+      "date": "2017-05-03T11:26:24.265Z",
+      "guilds": [
+        "191851128881676288",
+        "600500924284272650",
+        "285831759109685248"
+      ],
+      "shards": [],
+      "monthlyPoints": 1,
+      "points": 11,
+      "certifiedBot": false,
+      "owners": [
+        "266871424923336714",
+        "220804725631746048",
+        "180093157554388993"
+      ],
+      "tags": []
+    },
+    {
+      "defAvatar": "1cbd08c76f8af6dddce02c5138971129",
+      "invite": "https://discordapp.com/oauth2/authorize?client_id=287543843602038784&scope=bot&permissions=2136",
+      "website": "",
+      "github": "",
+      "longdesc": "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css\">\r\n<div class=\"notification\">\r\nRemember: BotGoPvP is in beta, if there is question ask on the discord server (joinable using bb!invite).\r\n</div>\r\n<h1 class=\"title is-1\">BotGoPvP</h1>\r\n<h3 class=\"subtitle is-3\">A bot in discordie.</h3>\r\n<h1 class=\"title is-1\">BotGoPvP can execute these commands </h1>\r\n<p>bb!help</p>\r\n<p>bb!ping</p>\r\n<p>bb!userinfo</p>\r\n<p>bb!myroles (Works only for your roles)</p>\r\n<p>bb!aboutbot</p>\r\n<p>bb!abal</p>\r\n<p>bb!invite</p>\r\n<p>bb!eval</p>\r\n<p>bb!friends</p>\r\n<p id=\"longdesc\"><style>\r\nbody {\r\n  background: #2E3192 no-repeat center center fixed;\r\n  background: -webkit-linear-gradient(-45deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\n  background: -o-linear-gradient(-45deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\n  background: -moz-linear-gradient(-45deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\n  background: linear-gradient(-35deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\ncolor: white;\r\n}\r\n\r\n#site-header .site-header-toprow {\r\n  box-shadow: none !important;\r\n  background: transparent !important;\r\n}\r\n\r\n#site-header {\r\n  background: transparent !important;\r\n}\r\n\r\na {\r\ncolor: white;\r\n}\r\n\r\navatar {\r\n  background: #2E3192 no-repeat center center fixed;\r\n  background: -webkit-linear-gradient(-45deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\n  background: -o-linear-gradient(-45deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\n  background: -moz-linear-gradient(-45deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\n  background: linear-gradient(-35deg, #2E3192, #1BFFFF) no-repeat center center fixed;\r\ncolor: white;\r\n}\r\n\r\n#site-header .site-header-toprow {\r\n  box-shadow: none !important;\r\n  background: transparent !important;\r\n}\r\n\r\n</style>",
+      "shortdesc": "An robot that is very cool !",
+      "prefix": "bb!",
+      "lib": "Discordie",
+      "clientid": "287543843602038784",
+      "avatar": "03c3f8732bbe633346d4a4262355a2ed",
+      "id": "287543843602038784",
+      "discriminator": "0349",
+      "username": "BotGoPvP",
+      "date": "2017-05-03T13:57:22.748Z",
+      "guilds": [
+        "450600261207982081"
+      ],
+      "shards": [],
+      "monthlyPoints": 2,
+      "points": 9,
+      "certifiedBot": false,
+      "owners": [
+        "170539775760138240"
+      ],
+      "tags": []
+    },
+    {
+      "defAvatar": "1cbd08c76f8af6dddce02c5138971129",
+      "invite": "https://discordapp.com/oauth2/authorize?client_id=313232463956803584&scope=bot&permissions=67619905",
+      "website": "",
+      "github": "",
+      "longdesc": "",
+      "shortdesc": "A bot to put all your fires on your discord servers!",
+      "prefix": "f>",
+      "lib": "discord.js",
+      "clientid": "313232463956803584",
+      "avatar": "78ba1f65edd2ef0ee177533787f55e31",
+      "id": "313232463956803584",
+      "discriminator": "9914",
+      "username": "Discord Fireman",
+      "date": "2017-05-16T16:54:03.538Z",
+      "guilds": [
+        "313014223632597003"
+      ],
+      "shards": [],
+      "monthlyPoints": 0,
+      "points": 3,
+      "certifiedBot": false,
+      "owners": [
+        "252001272146821120"
+      ],
+      "tags": []
+    },
+    {
+      "defAvatar": "322c936a8c8be1b803cd94861bdfa868",
+      "invite": "https://discordapp.com/oauth2/authorize?client_id=279674627918135297&scope=bot&permissions=2146958583",
+      "website": "",
+      "github": "",
+      "longdesc": "<style>\r\n@import url('https://fonts.googleapis.com/css?family=Raleway|Roboto+Slab');\r\np{font-family: 'Raleway', sans-serif;}\r\nh1,h2,h3,h4{font-family: 'Roboto Slab', serif;}\r\n</style>\r\nYou can get a few memes with ..memes<br/>\r\nYou can ask our personal assistant questions with ..iris {question}<br/>\r\nYou can get help by doing ..help<br/>\r\nNow enjoy your life<br/>\r\n<a href=\"//sorcerertech.pcriot.com/\">Made by Sorcerertech</a>",
+      "shortdesc": "A simple lil' bot that does memes, quotes and gives you information.",
+      "prefix": "..",
+      "lib": "discord.py",
+      "clientid": "279674627918135297",
+      "avatar": "807be4c267df8e7698bc343b2e74724d",
+      "id": "279674627918135297",
+      "discriminator": "8421",
+      "username": "STBot",
+      "date": "2017-05-21T18:27:26.998Z",
+      "server_count": 19,
+      "monthlyPoints": 2,
+      "points": 5,
+      "certifiedBot": false,
+      "owners": [
+        "258289468291809282"
+      ],
+      "tags": []
+    },
+    {
+      "defAvatar": "322c936a8c8be1b803cd94861bdfa868",
+      "invite": "https://discordapp.com/oauth2/authorize/?permissions=8&scope=bot&client_id=206955239985774593",
+      "website": "",
+      "support": "BgKgQDB",
+      "github": "",
+      "longdesc": "<style>\n\t@keyframes hover {\n\t\t0%{\n\t\t\tbox-shadow: 0 10px 20px 0px;\n\t\t\ttransform: translateY(0px)\n\t\t}\n\t\t50%{\n\t\t\tbox-shadow: 0 10px 10px 0px;\n\t\t\ttransform: translateY(-10px)\n\t\t}\n\t\t100%{\n\t\t\tbox-shadow: 0 10px 20px 0px;\n\t\t\ttransform: translateY(0px)\n\t\t}\n\t}\n\t.entity-header__image {\n\t\tbox-shadow: none !important;\n\t\tborder-radius: 50%;\n\t\tanimation: hover 4s ease-in-out infinite;\n\t}\n</style>\n\nSenpai is a easy to use Discord Bot what brings you Fun, Music and of course Anime to your Discord Server.\n\nTo see all of Senpai's commands use `%help`, to change the prefix use `%prefix newPrefixHere`.\n\nSenpai also is 24/7 online without major downtimes.\n",
+      "shortdesc": "THE ALL IN ONE WEEB BOT | ANIME IMAGES | FULL HD AUDIO | CURRENCY SYSTEM | GAMES | INFORMATION | MODERATION | TRY ME OUT NOW ❤",
+      "prefix": "% or @Senpai or Custom",
+      "lib": "discord.js",
+      "clientid": "206955239985774593",
+      "avatar": "c95d792e43be88edb648705537089433",
+      "id": "206955935229280256",
+      "discriminator": "4451",
+      "username": "Senpai",
+      "date": "2017-05-31T17:59:37.889Z",
+      "server_count": 110628,
+      "shard_count": 112,
+      "guilds": [
+        "304646217562980355",
+        "659824264844673094",
+        "750365461945778209",
+        "778311318393847809",
+        "662732600741462064",
+        "521322288524558342",
+        "524623500288458781",
+        "368989569502281730",
+        "713034250768875622",
+        "845743018266460201"
+      ],
+      "shards": null,
+      "monthlyPoints": 3,
+      "points": 366233,
+      "certifiedBot": false,
+      "owners": [
+        "184632227894657025"
+      ],
+      "tags": [
+        "Anime",
+        "Customizable Behavior",
+        "Fun",
+        "Meme",
+        "Moderation",
+        "Music"
+      ],
+      "bannerUrl": "",
+      "donatebotguildid": ""
+    },
+    {
+      "defAvatar": "0e291f67c9274a1abdddeb3fd919cbaa",
+      "invite": "https://discordapp.com/oauth2/authorize?client_id=252442396879486976&scope=bot&permissions=67159040",
+      "website": null,
+      "support": "vAbzRG9",
+      "github": "https://github.com/kawashirodev/TenshiBot",
+      "longdesc": "<p style=\"text-align:left\">\r\n<p align=\"left\">\r\n  <h1>Overwiew</h1>\r\n<p style=\"text-align:left\">\r\n<p align=\"left\">\r\n\r\n<li>Send pictures of various Touhou characters with 1 command including Flandre, Reimu and Tenshi.</li>\r\n<li>Search for tags on SafeBooru</li>\r\n<li>Made for Touhou fans </li>\r\n<li>Send emoji from another server!</li>\r\n<li>Chat and get info about new features in Tenshi's server</li>\r\n\r\n<h1></h1>\r\n\r\nNote: this description is rarely updated, to view all bot features use the help command\r\n<style>\r\nbody {\r\n        background-image: url(\"Hakurei.co.uk/tenshibot/discordbotsbg.jpg\");\r\n} \r\n \r\n</style>",
+      "shortdesc": "A booru bot for Touhou pictures",
+      "prefix": "=, @TenshiBot",
+      "lib": "discord.py",
+      "clientid": "252442396879486976",
+      "avatar": "6d8178e149ac450d00f388445d490d7f",
+      "id": "252442396879486976",
+      "discriminator": "5643",
+      "username": "TenshiBot",
+      "date": "2017-04-25T18:29:34.482Z",
+      "server_count": 2740,
+      "shard_count": null,
+      "guilds": [
+        "771026493538697237",
+        "426447572056670209",
+        "621710381160857601",
+        "550624974226980885",
+        "427501610420142081",
+        "389054724957274113",
+        "486196771635068930",
+        "607507827174408192",
+        "757055658347462788",
+        "696403450522763365"
+      ],
+      "shards": null,
+      "monthlyPoints": 1,
+      "points": 110,
+      "certifiedBot": false,
+      "owners": [
+        "166189271244472320"
+      ],
+      "tags": [
+        "anime",
+        "fun"
+      ],
+      "bannerUrl": null,
+      "donatebotguildid": null
+    },
+    {
+      "defAvatar": "322c936a8c8be1b803cd94861bdfa868",
+      "invite": "https://discordapp.com/oauth2/authorize?client_id=293738372499898368&scope=bot&permissions=0",
+      "website": "https://dashdelta.tech/",
+      "support": "",
+      "github": "",
+      "longdesc": "A D&D and Pathfinder bot that provides database searches for content, dice roller, and table generators. Helpful for general roleplaying as well!",
+      "shortdesc": "Toolbot for D&D 5e, 3.5, Pathfinder, and Starfinder",
+      "prefix": "-",
+      "lib": "discord.js",
+      "clientid": "293738372499898368",
+      "avatar": "c5bc0d0acce11e6febfdfda4366f7bde",
+      "id": "293738372499898368",
+      "discriminator": "8746",
+      "username": "Dash Delta",
+      "date": "2017-04-27T18:32:20.142Z",
+      "server_count": 6960,
+      "guilds": [
+        "910000175097999382",
+        "891347121884770334"
+      ],
+      "monthlyPoints": 2,
+      "points": 61,
+      "certifiedBot": false,
+      "owners": [
+        "130175406673231873"
+      ],
+      "tags": [
+        "Roleplay",
+        "Fun",
+        "Utility"
+      ]
+    },
+    {
+      "defAvatar": "6debd47ed13483642cf09e832ed0bc1b",
+      "invite": "https://discordapp.com/oauth2/authorize?&client_id=284678639956787200&scope=bot&permissions=523328",
+      "website": "https://andi.gg",
+      "support": "",
+      "github": "",
+      "longdesc": "Andi is fast and responsive and features several powerful commands to retrieve player stats, match summaries, and more for Vainglory, the mobile MOBA from Super Evil Megacorp. She is easy to use and provides several utility functions such as join/leave announcements and auto-deleting voice channel notifications. <b>1st Place Winner (eSports) 2017 Vainglory API Challenge</b>",
+      "shortdesc": "Andi is aimed at players and fans of Vainglory, the mobile MOBA",
+      "prefix": "a!",
+      "lib": "discord.js",
+      "clientid": "284678639956787200",
+      "avatar": "7c4a4edb936442190726d4dd9f8760cd",
+      "id": "284678639956787200",
+      "discriminator": "7260",
+      "username": "Andromeda",
+      "date": "2017-05-04T01:02:49.614Z",
+      "server_count": 1230,
+      "guilds": [
+        "343320097915404288",
+        "459039694831878145"
+      ],
+      "monthlyPoints": 1,
+      "points": 26,
+      "certifiedBot": false,
+      "owners": [
+        "127421302758834176"
+      ],
+      "tags": [
+        "Game"
+      ]
+    },
+    {
+      "defAvatar": "6debd47ed13483642cf09e832ed0bc1b",
+      "invite": "https://discordapp.com/oauth2/authorize?client_id=673737213959208980&scope=bot&permissions=805596240",
+      "website": "https://github.com/henry232323/RPGBot",
+      "support": "mXZg2mk",
+      "github": "https://github.com/henry232323/RPGBot",
+      "longdesc": "The link to add the bot above now points to the invite for RPGBot-v2, if you want to add old RPGBot, please use [this](https://discordapp.com/oauth2/authorize?client_id=305177429612298242&scope=bot&permissions=805694529) link\n\n# Commands\n## For a full and up to date command list, please see the <a href=\"https://github.com/henry232323/RPGBot\">website</a>\n\n## Characters Commands\n\n#### allchars\n>**Description:** List all guild characters\n\n>**Usage:** `rp!allchars`\n\n#### character\n>**Description:** Get info on a character\n\n>**Usage:** `rp![character|c|char|personnage] <name>`\n\n#### character create\n>**Description:** Create a new character\n\n>**Usage:** `rp!character [create|new|nouveau|creer] <name> [user]`\n\n#### character delete\n>**Description:** Delete a character of the given name (you must be the owner)\n\n>**Usage:** `rp!character [delete|remove|supprimer] <name>`\n\n#### character edit\n>**Description:** Edit a character\nUsage: rp!character edit John description John likes bananas!\nValid values for the [item] (second argument):\n    name: the character's name\n    description: the description of the character\n    level: an integer representing the character's level\n    meta: used like the additional info section when creating; can be used to edit/remove all attributes\nAnything else will edit single attributes in the additional info section\n\n>**Usage:** `rp!character edit <character> <attribute> <value>`\n\n#### character remattr\n>**Description:** Delete a character attribute\nUsage: rp!character remattr John hair color\n\n>**Usage:** `rp!character remattr <character> <attribute>`\n\n#### characters\n>**Description:** List all your characters\n\n>**Usage:** `rp![characters|chars|personnages] [user]`\n\n## Economy Commands\n\n#### ***Economy related commands: balance, market, etc***\n\n#### baltop\n>**Description:** Get the top 10 server balances\n\n>**Usage:** `rp!baltop`\n\n#### bank deposit\n>**Description:** Deposit `amount` into the bank\n\n>**Usage:** `rp!bank deposit <amount>`\n\n#### bank withdraw\n>**Description:** Withdraw `amount` from the bank\n\n>**Usage:** `rp!bank withdraw <amount>`\n\n#### bid\n>**Description:** Place a bid on the current bidding item in the channel\n\n>**Usage:** `rp!bid`\n\n#### economy\n>**Description:** Check your or another users balance\n\n>**Usage:** `rp![economy|bal|balance|eco|e] [member]`\n\n#### givemoney\n>**Description:** Give the member's money (Moderators)\n\n>**Usage:** `rp!givemoney <amount> [members...]`\n\n#### lotto\n>**Description:** List the currently running lottos.\n\n>**Usage:** `rp![lotto|lottery]`\n\n#### lotto cancel\n>**Description:** Cancel a lottery\n\n>**Usage:** `rp!lotto [cancel|delete] <name>`\n\n#### lotto enter\n>**Description:** Enter the lottery with the given name.\n\n>**Usage:** `rp!lotto [enter|join] <name>`\n\n#### lotto new\n>**Description:** Create a new lotto, with jacpot payout lasting time in seconds\n\n>**Usage:** `rp!lotto [new|create] <name> <jackpot> <time>`\n\n#### market\n>**Description:** View the current market listings\n\n>**Usage:** `rp![market|m|pm]`\n\n#### market buy\n>**Description:** Buy a given amount of an item from the player market at the cheapest given price\n\n>**Usage:** `rp!market [buy|purchase|acheter] <id>`\n\n#### market create\n>**Description:** Create a new market listing\n\n>**Usage:** `rp!market [create|createlisting|new|listitem|list] <cost> <amount> <item>`\n\n#### market remove\n>**Description:** Remove an item from the market\n\n>**Usage:** `rp!market [remove|rm] <id>`\n\n#### market search\n>**Description:** Search the market for an item\n\n>**Usage:** `rp!market search <item>`\n\n#### pay\n>**Description:** Pay another user money\n\n>**Usage:** `rp!pay <amount> <member>`\n\n#### setbalance\n>**Description:** Set the balance of the given members to an amount\n\n>**Usage:** `rp![setbalance|set] <amount> [members...]`\n\n#### shop\n>**Description:** Get all items currently listed on the server shop\n\n>**Usage:** `rp!shop`\n\n#### shop additem\n>**Description:** Add an item to the server shop, to make an item unsaleable or unbuyable set their respective values to 0\npb!additem Pokeball\n-> 0\n-> 10\nCan be sold for 10 and cannot be bought. Must be an existing item! Requires Bot Moderator or Admin\n\n>**Usage:** `rp!shop [additem|add] <name>`\n\n#### shop buy\n>**Description:** Buy an item from the shop\n\n>**Usage:** `rp!shop buy <item> <amount>`\n\n#### shop removeitem\n>**Description:** Remove a listed item\n\n>**Usage:** `rp!shop removeitem <name>`\n\n#### shop sell\n>**Description:** Sell an item to the shop\n\n>**Usage:** `rp!shop sell <item> <amount>`\n\n#### startbid\n>**Description:** Start a bid for an item\n\n>**Usage:** `rp!startbid <item> <amount> <startbid>`\n\n#### takemoney\n>**Description:** Take the member's money (Moderators)\n\n>**Usage:** `rp!takemoney <amount> [members...]`\n\n## Groups Commands\n\n#### ***Commands for guild management***\n\n#### guild\n>**Description:** Get info on a member's guild. Subcommands for guild management\n\n>**Usage:** `rp![guild|g] [member]`\n\n#### guild create\n>**Description:** Create a new guild\n\n>**Usage:** `rp!guild create <name>`\n\n#### guild delete\n>**Description:** Delete your guild\n\n>**Usage:** `rp!guild delete [name]`\n\n#### guild deposit\n>**Description:** Deposit an amount of money into the guild bank\n\n>**Usage:** `rp!guild deposit <amount> [guild_name]`\n\n#### guild deposititems\n>**Description:** Deposit items into the guild's storage, uses {item}x{#} notation\n\n>**Usage:** `rp!guild deposititems [items...]`\n\n#### guild info\n>**Description:** Get info on a guild\n\n>**Usage:** `rp!guild info <name>`\n\n#### guild invite\n>**Description:** Invite a user your closed guild\n\n>**Usage:** `rp!guild invite <user>`\n\n#### guild join\n>**Description:** Join a guild (if you have an invite for closed guilds)\n\n>**Usage:** `rp!guild join <name>`\n\n#### guild kick\n>**Description:** Kick a member from a guild\n\n>**Usage:** `rp!guild kick <user>`\n\n#### guild leave\n>**Description:** Leave your guild\n\n>**Usage:** `rp!guild leave`\n\n#### guild setdescription\n>**Description:** Set the guild's description\n\n>**Usage:** `rp!guild [setdescription|setdesc] <description>`\n\n#### guild seticon\n>**Description:** Set the guild's icon\n\n>**Usage:** `rp!guild seticon <url>`\n\n#### guild setimage\n>**Description:** Set the guild's image\n\n>**Usage:** `rp!guild setimage <url>`\n\n#### guild setmod\n>**Description:** Give the listed users mod for your guild (guild owner only)\n\n>**Usage:** `rp!guild setmod [members...]`\n\n#### guild toggleopen\n>**Description:** Toggle the Guilds open state\n\n>**Usage:** `rp!guild toggleopen`\n\n#### guild transfer\n>**Description:** Transfer ownership of a guild to someone else\n\n>**Usage:** `rp!guild transfer <user>`\n\n#### guild withdraw\n>**Description:** Take money from the guild bank\n\n>**Usage:** `rp!guild withdraw <amount>`\n\n#### guild withdrawitems\n>**Description:** Withdraw items from the guild (guild mods only)\n\n>**Usage:** `rp!guild withdrawitems [items...]`\n\n#### guilds\n>**Description:** List guilds\n\n>**Usage:** `rp!guilds`\n\n## Inventory Commands\n\n#### craft\n>**Description:** Craft a recipe with a given name from the available server recipes; e.g. rp!craft 5 Apple Pie\n\n>**Usage:** `rp!craft <number> <name>`\n\n#### give\n>**Description:** Give items ({item}x{#}) to a member; ie: rp!give @Henry#6174 Pokeballx3\n\n>**Usage:** `rp!give <other> [items...]`\n\n#### giveitem\n>**Description:** Give an item to a person (Not out of your inventory)\nExample: rp!giveitem Banana 32 @Henry#6174 @RPGBot#8700 @JoeShmoe#3012\n\n>**Usage:** `rp!giveitem <item> <num> [members...]`\n\n#### inventory\n>**Description:** Check your or another users inventory. Example: rp!inventory @Henry#6174 or just rp!inventory\n\n>**Usage:** `rp![inventory|i|inv] [member]`\n\n#### lootbox\n>**Description:** List the current lootboxes\n\n>**Usage:** `rp![lootbox|lb] [name]`\n\n#### lootbox buy\n>**Description:** Buy a lootbox of the given name\n\n>**Usage:** `rp!lootbox buy <name>`\n\n#### lootbox create\n>**Description:** Create a new lootbox, under the given `name` for the given cost\nUse {item}x{#} notation to add items with {#} weight\nWeight being an integer. For example:\nrp!lootbox create MyBox 500 bananax2 orangex3. The outcome of the box will be\nRandom Choice[banana, banana, orange, orange, orange]\nThe price can also be an item (or several items), for example\nrp!lootbox create MyBox Key bananax2 orangex3\nor\nrp!lootbox create MyBox Keyx2 bananax3 orangex3\n\n>**Usage:** `rp!lootbox [create|new] <name> <cost> [items...]`\n\n#### lootbox delete\n>**Description:** Delete a lootbox with the given name\n\n>**Usage:** `rp!lootbox [delete|remove] <name>`\n\n#### offer\n>**Description:** Send a trade offer to another user. Usage: rp!inventory offer @Henry bananax3 applex1 --Format items as {item}x{#}\n\n>**Usage:** `rp!offer <other> [items...]`\n\n#### recipe\n>**Description:** Subcommands for recipes. See data on a specific recipe; e.g. rp!recipe Banana\n\n>**Usage:** `rp!recipe <name>`\n\n#### recipe create\n>**Description:** Create a new recipe; e.g.\n> rp!recipe create Apple Pie\n>> What items must be consumed to follow this recipe? e.g. Applex5 Breadx2\n> Applex5 Breadx15 \"Pie Tinx1\"\n>> What items will be given upon the completion of this recipe? e.g. \"Apple Piex1\"\n> \"Apple Piex1\" \"Pie Tinx1\"\n>> Successfully created new recipe!\n\n>**Usage:** `rp!recipe create <name>`\n\n#### recipe delete\n>**Description:** Delete the recipe with the given name; e.g. rp!recipe delete Apple Pie\n\n>**Usage:** `rp!recipe delete <name>`\n\n#### recipes\n>**Description:** List all the available server recipes\n\n>**Usage:** `rp!recipes`\n\n#### respond\n>**Description:** Respond to a trade offer by another user. Usage: rp!inventory respond @Henry grapex8 applex1 --Format items as {item}x{#}\n\n>**Usage:** `rp!respond <other> [items...]`\n\n#### takeitem\n>**Description:** Remove an item from a person's inventory\n\n>**Usage:** `rp![takeitem|take] <item> <num> [members...]`\n\n#### use\n>**Description:** Use an item. Example `rp!use Banana` or `rp!use Banana 5`\nTo make an item usable, you must put the key `used: <message>` when you are adding additional information for an item\n\n>**Usage:** `rp!use <item> [number=1]`\n\n#### wipeinv\n>**Description:** Wipe all listed inventories. Must be administrator. To wipe ALL inventories do `rp!wipeinv everyone`\n\n>**Usage:** `rp!wipeinv [members...]`\n\n## Mapping Commands\n\n#### map\n>**Description:** See the server map\n\n>**Usage:** `rp![map|carte] <name>`\n\n#### map buy\n>**Description:** Buy an item from the shop on the current tile\n\n>**Usage:** `rp!map buy <mapname> <character> <amount> <itemname>`\n\n#### map check\n>**Description:** Inspect the current tile a character is on\n\n>**Usage:** `rp!map [check|look|regarder|inspect|voir] <mapname> <character>`\n\n#### map create\n>**Description:** Create a map that will generate as it is explored. Set xmax and ymax to -1 for an infinite map\n($5 Patrons only)\n\n>**Usage:** `rp!map create <mapname> <xmax> <ymax>`\n\n#### map delete\n>**Description:** Delete a map\n\n>**Usage:** `rp!map [delete|supprimer] <name>`\n\n#### map down\n>**Description:** Move south on a map\n\n>**Usage:** `rp!map [down|south|sud] <mapname> <character>`\n\n#### map generate\n>**Description:** Create a custom map for the guild.\nUsage: `rp!map create Earth 64 64`\n    This will create a 64x64 map that will generate as the players explore it\n\n>**Usage:** `rp!map [generate|creer|new|nouvelle] <name> <xsize> <ysize>`\n\n#### map left\n>**Description:** Move West on a map\n\n>**Usage:** `rp!map [left|west|ouest|gauche] <mapname> <character>`\n\n#### map right\n>**Description:** Move East on a map\n\n>**Usage:** `rp!map [right|east|est|droit] <mapname> <character>`\n\n#### map up\n>**Description:** Move North on a map\n\n>**Usage:** `rp!map [up|north|nord] <mapname> <character>`\n\n## Misc Commands\n\n#### donate\n>**Description:** Donation information\n\n>**Usage:** `rp!donate`\n\n#### feedback\n>**Description:** Give me some feedback on the bot\n\n>**Usage:** `rp!feedback <feedback>`\n\n#### info\n>**Description:** Bot Info\n\n>**Usage:** `rp!info`\n\n#### ping\n>**Description:** Test the bot's connection ping\n\n>**Usage:** `rp!ping`\n\n#### rtd\n>**Description:** Roll a number of dice with given sides (ndx notation)\nExample: rp!rtd 3d7 2d4\nOptional Additions:\n    Test for success by adding a >/<#\n    Grab the top n rolls by adding ^n\n    Add to the final roll by just adding a number (pos or neg)\n    \n    Examples of all:\n        rp!rtd 8d8 -12 15 ^4 >32\n        \n        -> Roll failed (30 > 32) ([8 + 7 + 6 + 6] + -12 + 15) (Grabbed top 4 out of 8)\n\n>**Usage:** `rp![rtd|rollthedice|dice] [dice...]`\n\n#### source\n>**Description:** Displays my full source code or for a specific command.\nTo display the source code of a subcommand you have to separate it by\nperiods, e.g. tag.create for the create subcommand of the tag command.\n\n>**Usage:** `rp!source [command]`\n\n#### totalcmds\n>**Description:** Get totals of commands and their number of uses\n\n>**Usage:** `rp!totalcmds`\n\n## Pets Commands\n\n#### box\n>**Description:** Check the pet in your box\n\n>**Usage:** `rp!box [member]`\n\n#### pet\n>**Description:** Subcommands for Pet management, see rp!help pet\nSame use as rp!box\n\n>**Usage:** `rp![pet|p] [member]`\n\n#### pet create\n>**Description:** Create a new Pet to add to your box\n\n>**Usage:** `rp!pet [create|new]`\n\n#### pet edit\n>**Description:** Edit a pet\nUsage: rp!pet edit 5 description John likes bananas!\nValid values for the [item] (second argument):\n    name: the character's name\n    description: the description of the character\n    level: an integer representing the character's level\n    meta: used like the additional info section when creating; can be used to edit/remove all attributes\nAnything else will edit single attributes in the additional info section\n\n>**Usage:** `rp!pet edit <pet_id> <attribute> <value>`\n\n#### pet info\n>**Description:** Get info on a Pet\n\n>**Usage:** `rp!pet info <id>`\n\n#### pet release\n>**Description:** Release a Pet from your box\n\n>**Usage:** `rp!pet [release|delete|rm|remove] <id>`\n\n#### pet trade\n>**Description:** Offer a trade to a user.\n`your_id` is the ID of the Pet you want to give, `their_id` is the Pet you want from them.\n`other` being the user you want to trade with\n\n>**Usage:** `rp!pet trade <your_id> <their_id> <other>`\n\n## Salary Commands\n\n#### ***Salary commands***\n\n#### salaries\n>**Description:** See server salaries\n\n>**Usage:** `rp!salaries`\n\n#### salary\n>**Description:** Get a role's salary. Also includes salary subcommands\n\n>**Usage:** `rp![salary|sal] <role>`\n\n#### salary create\n>**Description:** Create a daily salary for a user with the given role.\nRoles are paid every day at 24:00, every user with the role will receive the amount specified.\nIf a role with a salary is deleted, the salary will also be deleted.\nFor example\n`rp!salary create @Bot Creator 500` Will create a salary of $500 for a user daily\n`rp!salary create @Bot Creator Bananax3 Orangex4` Will create a salary of 3 Bananas and 4 Oranges for a user daily\n\n>**Usage:** `rp!salary create <role> [items_or_number...]`\n\n#### salary delete\n>**Description:** Remove a created salary\n\n>**Usage:** `rp!salary delete <role>`\n\n#### salary payout\n>**Description:** Manually pay out salaries for a role or all roles\n\n>**Usage:** `rp!salary payout [role]`\n\n## Settings Commands\n\n#### currency\n>**Description:** Set the guild currency\n\n>**Usage:** `rp!currency <currency>`\n\n#### deleteafter\n>**Description:** Set a time for messages to be automatically deleted after running. `rp!deleteafter 0` to make messages never be deleted\n\n>**Usage:** `rp!deleteafter <time>`\n\n#### language\n>**Description:** Set the guild language or check the language\n\n>**Usage:** `rp!language [language]`\n\n#### loaddnd\n>**Description:** This command will pre-load all D&D items and make them available to give\n\n>**Usage:** `rp!loaddnd`\n\n#### loaddndmagic\n>**Description:** This command will pre-load all D&D Magic items and make them available to give\n\n>**Usage:** `rp!loaddndmagic`\n\n#### loaddndshop\n>**Description:** This command will pre-load all D&D items and make them available in shop\n\n>**Usage:** `rp!loaddndshop`\n\n#### loadmagicshop\n>**Description:** This command will pre-load all D&D Magic items and make them available in shop\n\n>**Usage:** `rp!loadmagicshop`\n\n#### loadpokemon\n>**Description:** This command will pre-load all Pokemon items and make them available to give\n\n>**Usage:** `rp!loadpokemon`\n\n#### loadstarwars\n>**Description:** This command will pre-load all D&D items and make them available to give\n\n>**Usage:** `rp!loadstarwars`\n\n#### loadstarwarsshop\n>**Description:** This command will pre-load all D&D items and make them available in shop\n\n>**Usage:** `rp!loadstarwarsshop`\n\n#### setstart\n>**Description:** Set the money start amount for a guild\n\n>**Usage:** `rp!setstart <amount>`\n\n#### settings\n>**Description:** Get the current server settings\n\n>**Usage:** `rp![settings|s|configuration|conf]`\n\n#### settings additem\n>**Description:** Add a custom item.\nCustom keys that can be used for special additions:\n   `image` Setting this to a URL will give that item a special thumbnail when info is viewed for it\n   \n\n>**Usage:** `rp!settings additem <name>`\n\n#### settings iteminfo\n>**Description:** Get info on a server item\n\n>**Usage:** `rp!settings iteminfo <item>`\n\n#### settings items\n>**Description:** See all items for a guild\n\n>**Usage:** `rp!settings items [letter]`\n\n#### settings removeitem\n>**Description:** Remove a custom item\n\n>**Usage:** `rp!settings [removeitem|deleteitem] <name>`\n\n#### unload\n>**Description:** Unload Pokemon, D&D, or D&D Magic items. `rp!unload pokemon` `rp!unload dnd` `rp!unload dndmagic`\n\n>**Usage:** `rp!unload <name>`\n\n## Team Commands\n\n#### team\n>**Description:** Check a character's team\n\n>**Usage:** `rp!team <character>`\n\n#### team add\n>**Description:** Add a Pet to a character's team\n\n>**Usage:** `rp!team [add|addmember] <character> <id>`\n\n#### team remove\n>**Description:** Remove a Pet from a character's team\n\n>**Usage:** `rp!team [remove|removemember] <character> <id>`\n\n## User Commands\n\n#### ***Commands for guild management***\n\n#### experience\n>**Description:** Get your or another user's level information. Help on this command for experience subcommands\nEXP is calculated using a 0.1x^2+5x+4 where x is equal to the user's current level\nSpamming commands or messages will not earn more exp!\n\n>**Usage:** `rp![experience|exp] [member]`\n\n#### experience add\n>**Description:** Give the given members an amount of experience\n\n>**Usage:** `rp!experience add <amount> [members...]`\n\n#### experience disable\n>**Description:** Disable EXP settings for a guild\n\n>**Usage:** `rp!experience disable`\n\n#### experience enable\n>**Description:** Enable EXP settings for a guild\n\n>**Usage:** `rp!experience enable`\n\n#### experience setlevel\n>**Description:** Set the given members level\n\n>**Usage:** `rp!experience [setlevel|set] <level> [members...]`\n\n#### userinfo\n>**Description:** Get info on a user\n\n>**Usage:** `rp![userinfo|ui] [user]`\n",
+      "shortdesc": "A RP bot, with a working inventory, market and economy, team setups and characters aswell",
+      "prefix": "rp!",
+      "lib": "discord.py",
+      "clientid": "305177429612298242",
+      "avatar": "6e09cd8bdfd517d4200288a34d71d198",
+      "id": "305177429612298242",
+      "discriminator": "8700",
+      "username": "RPGBot",
+      "date": "2017-05-06T15:10:11.736Z",
+      "server_count": 17362,
+      "shard_count": null,
+      "guilds": [
+        "758377739265900554",
+        "708074366176591872"
+      ],
+      "shards": null,
+      "monthlyPoints": 3,
+      "points": 1172,
+      "certifiedBot": true,
+      "owners": [
+        "122739797646245899"
+      ],
+      "tags": [
+        "economy",
+        "fun",
+        "game",
+        "leveling",
+        "roleplay",
+        "utility"
+      ],
+      "bannerUrl": null,
+      "donatebotguildid": "303307934774067210"
+    },
+    {
+      "defAvatar": "1cbd08c76f8af6dddce02c5138971129",
+      "invite": "http://marshall.cat/azhex/invite.php?version=beta",
+      "website": "http://marshall.cat/azhex",
+      "github": "",
+      "longdesc": "",
+      "shortdesc": "AzhexBeta is the beta version of Azhex",
+      "prefix": "$",
+      "lib": "discord.py",
+      "clientid": "299512983418306560",
+      "avatar": "b5fbe625d1b077cc582f42dd60accd46",
+      "id": "299512983418306560",
+      "discriminator": "4744",
+      "username": "AzhexBeta",
+      "date": "2017-06-02T11:41:30.761Z",
+      "server_count": 15,
+      "shard_count": null,
+      "guilds": [],
+      "shards": null,
+      "monthlyPoints": 2,
+      "points": 6,
+      "certifiedBot": false,
+      "owners": [
+        "182113750348857344"
+      ],
+      "tags": []
+    }
+  ],
+  "limit": 10,
+  "offset": 0,
+  "count": 10,
+  "total": 42969
+}

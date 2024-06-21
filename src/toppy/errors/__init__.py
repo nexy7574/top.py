@@ -1,3 +1,10 @@
+import typing
+
+
+if typing.TYPE_CHECKING:
+    from toppy.ratelimiter.bucket import Ratelimit
+
+
 class ToppyError(Exception):
     """
     The base exception for all top.py errors.
@@ -34,12 +41,13 @@ class Ratelimited(ToppyError):
     __str__: str - A nicely formatted message describing this error
     """
 
-    def __init__(self, retry_after: float = 0.0, *, internal: bool = False):
+    def __init__(self, retry_after: float = 0.0, *, limiter: "Ratelimit" = None, internal: bool = False):
         self.internal = internal
+        self.limiter = limiter
         self.retry_after = retry_after
 
     def __str__(self):
-        who = "internal ratelimiter" if self.internal else "top.gg API"
+        who = f"internal ratelimiter ({self.limiter})" if self.internal else "top.gg API"
         return f"Ratelimited by the {who} - Retry after " + str(self.retry_after) + "s"
 
 
