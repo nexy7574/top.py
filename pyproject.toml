@@ -53,3 +53,6 @@ line-length = 120
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+
+[tool.setuptools_scm]
+write_to = "toppy/version.py"
