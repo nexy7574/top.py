@@ -1,10 +1,10 @@
 {
   "discriminator": "7574",
-  "avatar": "0fd0a00f8a39166d500bc685375d8eee",
+  "avatar": "abcdef0123456789",
   "id": "421698654189912064",
   "username": "eek",
-  "defAvatar": "1cbd08c76f8af6dddce02c5138971129",
-  "bio": "You (probably) know who I am",
+  "defAvatar": "abcdef0123456789",
+  "bio": "bio",
   "color": "#9c43be",
   "admin": false,
   "webMod": false,

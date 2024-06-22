@@ -1,3 +1,5 @@
+import asyncio
+import datetime
 import logging
 import json
 import time
@@ -23,9 +25,18 @@ def _load_response(name: str, model: type = None):
 
 
 def _get_topgg_client():
+    class FakeClientUser:
+        id = 235148962103951360
     from toppy.client import TopGG
     from discord import Client, Intents
     client = Client(intents=Intents.default())
+
+    # Mock a running client
+    client._ready = asyncio.Event()
+    client._ready.set()
+    client._connection._guilds = {}
+    client._connection.user = FakeClientUser()
+
     topgg = TopGG(client, token="...")
     return topgg
 
@@ -58,7 +69,7 @@ def test_ratelimiter(path: str):
 
 
 @pytest.mark.asyncio()
-async def test_search_bots():
+async def test_fetch_bots():
     from toppy.models.bot import BotSearchResult
 
     with aioresponses() as m:
@@ -77,7 +88,7 @@ async def test_search_bots():
 
 
 @pytest.mark.asyncio()
-async def test_search_bot():
+async def test_fetch_bot():
     from toppy.models.bot import Bot
 
     with aioresponses() as m:
@@ -88,6 +99,112 @@ async def test_search_bot():
         topgg = _get_topgg_client()
         result = await topgg.fetch_bot(discord.Object(id=235148962103951360))
         assert isinstance(result, Bot), "Result is not Bot"
+        assert result.id == 235148962103951360
+        assert result.username == "Example"
+        assert result.invite == "https://invite.example"
+        assert result.support == "AbCdEfG"
+        assert result.github is None
+        assert result.longdesc == "A very long description"
+        assert result.shortdesc == "A very short description"
+        assert result.defAvatar == "abcdef0123456789"
+        assert result.avatar == "abcdef0123456789"
+        assert result.discriminator == 1234
+        assert result.lib == "discord.py"
+        assert result.date == datetime.datetime.fromisoformat("2018-02-15T17:25:12.552Z")
+        assert result.prefix == "!"
+        assert result.server_count == 1
+        assert result.shard_count is None
+        assert result.guilds == [729779146682793984]
+        assert result.monthlyPoints == 1
+        assert result.points == 2
+        assert result.certifiedBot is False
+        assert result.owners == [421698654189912064]
+        assert result.tags == ["example"]
+
+
+@pytest.mark.asyncio()
+async def test_fetch_votes():
+    with aioresponses() as m:
+        m.get(
+            "https://top.gg/api/bots/235148962103951360/votes",
+            payload=_load_response("get_bot_votes.json")
+        )
+        topgg = _get_topgg_client()
+        result = await topgg.fetch_votes()
+        assert result == []
+
+
+@pytest.mark.asyncio()
+async def test_upvote_check():
+    with aioresponses() as m:
+        m.get(
+            "https://top.gg/api/bots/235148962103951360/check?userId=235148962103951360",
+            payload=_load_response("get_vote_check.json")
+        )
+        topgg = _get_topgg_client()
+        result = await topgg.vote_check(discord.Object(id=235148962103951360))
+        assert result.voted == 1
+
+
+@pytest.mark.asyncio()
+async def test_get_stats():
+    from toppy import BotStatsResult
+    with aioresponses() as m:
+        m.get(
+            "https://top.gg/api/bots/235148962103951360/stats",
+            payload=_load_response("get_bot_stats.json")
+        )
+        topgg = _get_topgg_client()
+        result = await topgg.get_stats(discord.Object(id=235148962103951360))
+        assert isinstance(result, BotStatsResult)
+        assert result.server_count == 1
+        assert result.shard_count is None
+        assert result.shards is None
+
+
+@pytest.mark.asyncio()
+async def test_post_stats():
+    from toppy import BotStatsPayload
+    with aioresponses() as m:
+        m.post(
+            "https://top.gg/api/bots/235148962103951360/stats",
+            payload=_load_response("get_bot_stats.json")
+        )
+        topgg = _get_topgg_client()
+        result = await topgg.post_stats()
+        assert isinstance(result, BotStatsPayload)
+        assert result.server_count == 1
+        assert result.shard_count is None
+        assert result.shards is None
+        assert result.shard_id is None
+
+
+@pytest.mark.asyncio()
+async def test_fetch_user():
+    from toppy import User
+    with aioresponses() as m:
+        m.get(
+            "https://top.gg/api/users/421698654189912064",
+            payload=_load_response("get_user.json")
+        )
+        topgg = _get_topgg_client()
+        result = await topgg.fetch_user(discord.Object(id=421698654189912064))
+        assert isinstance(result, User)
+        assert result.id == 421698654189912064
+        assert result.discriminator == 7574
+        assert result.defAvatar == "abcdef0123456789"
+        assert result.username == "eek"
+        assert result.bio == "bio"
+        assert result.admin is False
+        assert result.mod is False
+        assert result.webMod is False
+        assert result.certifiedDev is False
+        assert result.supporter is False
+        assert result.social.youtube is None
+        assert result.social.twitter is None
+        assert result.social.reddit is None
+        assert result.social.github is None
+        assert result.color == "#9c43be"
 
 
 def test_short_ratelimit():

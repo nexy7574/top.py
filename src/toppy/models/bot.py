@@ -1,3 +1,6 @@
+import datetime
+
+
 try:
     from pydantic.dataclasses import dataclass
     from pydantic import Field as field
@@ -25,13 +28,13 @@ class Bot:
 
     See Also: https://docs.top.gg/docs/API/bot#bot-structure
     """
-    id: str
+    id: int
     """The id of the bot"""
 
     username: str
     """The username of the bot"""
 
-    discriminator: str
+    discriminator: int
     """The discriminator of the bot"""
 
     lib: str
@@ -46,10 +49,10 @@ class Bot:
     tags: List[str]
     """The tags of the bot"""
 
-    owners: List[str]
+    owners: List[int]
     """Snowflakes of the owners of the bot. First one in the array is the main owner"""
 
-    date: str
+    date: datetime.datetime
     """The date when the bot was approved"""
 
     certifiedBot: bool
@@ -63,6 +66,9 @@ class Bot:
 
     donatebotguildid: Optional[str] = None
     """The guild id for the donatebot setup"""
+
+    guilds: List[int] = field(default_factory=list)
+    """The guilds featured on the bot page"""
 
     vanity: Optional[str] = None
     """The vanity url of the bot"""
@@ -141,7 +147,7 @@ class BotStatsResult:
 
     See Also: https://docs.top.gg/docs/API/bot#bot-stats
     """
-    shards: List[int] = field(default_factory=list)
+    shards: Optional[List[int]] = field(default_factory=list)
     """The amount of servers the bot is in per shard."""
 
     server_count: Optional[int] = None

@@ -1,4 +1,8 @@
-from dataclasses import dataclass
+try:
+    from pydantic.dataclasses import dataclass
+    from pydantic import Field as field
+except ImportError:
+    from dataclasses import dataclass, field
 from typing import Optional
 
 
@@ -27,20 +31,17 @@ class User:
 
     See Also: https://docs.top.gg/docs/API/user#structure
     """
-    id: str
+    id: int
     """ The ID of the user"""
 
     username: str
     """ The username of the user"""
 
-    discriminator: str
+    discriminator: int
     """ The discriminator of the user"""
 
     defAvatar: str
     """The cdn hash of the user's avatar if the user has none"""
-
-    social: Social
-    """The social usernames of the user"""
 
     supporter: bool
     """The supporter status of the user"""
@@ -66,3 +67,6 @@ class User:
     color: Optional[str] = None
     """The custom hex color of the user (not guaranteed to be valid hex)"""
     # Top.gg, why can you not validate its hex? do you validate it at all yourselves?
+
+    social: Social = field(default_factory=Social)
+    """The social usernames of the user"""

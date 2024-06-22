@@ -80,9 +80,3 @@ class Ratelimit:
             self.reset()
             self.expires = datetime.now(tz=timezone.utc) + timedelta(seconds=self.per)
         self.__hits += 1
-        logging.critical(
-            "Increase internal hit count by one, for %d/%d, expiring at %s",
-            self.hits,
-            self.max_hits,
-            self.expires
-        )
