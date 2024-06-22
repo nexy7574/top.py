@@ -55,4 +55,4 @@ line-length = 120
 asyncio_mode = "auto"
 
 [tool.setuptools_scm]
-write_to = "toppy/version.py"
+write_to = "src/toppy/version.py"
