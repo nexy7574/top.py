@@ -178,7 +178,7 @@ class TopGG:
                 raise Ratelimited(rlc.retry_after, limiter=rlc, internal=True)
         if self.ratelimits["*"].ratelimited:
             logger.warning(
-                f"Ratelimited for {self.ratelimitsself.ratelimits['*'].retry_after*1000:,}ms. Handled under the bucket /*."
+                f"Ratelimited for {self.ratelimits['*'].retry_after*1000:,}ms. Handled under the bucket /*."
                 f" Perhaps review how many requests you're sending?"
             )
             raise Ratelimited(self.ratelimits["*"].retry_after, limiter=self.ratelimits["*"], internal=True)
