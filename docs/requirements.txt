@@ -1,2 +1,2 @@
-discord.py>=1.7.0
+py-cord
 sphinx_rtd_theme
