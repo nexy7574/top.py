@@ -13,6 +13,7 @@
 import os
 import re
 import sys
+from importlib.metadata import version
 from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(".."))
@@ -20,16 +21,13 @@ sys.path.insert(0, os.path.abspath("."))
 if not (Path(__file__).parent / "_static").exists():
     os.mkdir("_static")
 
-with open("../toppy/client.py") as client:
-    version_regex = re.compile(r"__version__ = \"(?P<v>[0-9]\.[0-9]{1,2}\.[0-9]+)(-(pre|alpha|beta)\.[0-9]+)?\"")
-    ct = client.read()
-    __version__ = version_regex.search(ct).group("v")
+__version__ = version("top.py")
 
 # -- Project information -----------------------------------------------------
 
 project = "top.py"
-copyright = "2022, EEKIM10"
-author = "EEKIM10"
+copyright = "2024, nexy7574"
+author = "nexy7574"
 version = __version__
 
 # -- General configuration ---------------------------------------------------
@@ -49,7 +47,7 @@ intersphinx_mapping = {
     "http": ("https://docs.aiohttp.org/en/stable/", None),
 }
 extlinks = {
-    "issue": ("https://github.com/EEKIM10/top.py/issues/%s", "GH-"),
+    "issue": ("https://github.com/nexy7574/top.py/issues/%s", "GH-"),
 }
 autodoc_member_order = "bysource"
 
